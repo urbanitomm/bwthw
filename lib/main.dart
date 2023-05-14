@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:progetto_wearable/data.dart';
+import 'package:progetto_wearable/test_home.dart';
 import 'package:progetto_wearable/homepage.dart';
-import 'package:progetto_wearable/hp_temp.dart';
 import 'package:progetto_wearable/diary.dart';
+import 'package:progetto_wearable/login.dart';
+import 'package:progetto_wearable/data.dart';
 
 void main() {
   runApp(MyApp());

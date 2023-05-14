@@ -1,16 +1,18 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:progetto_wearable/homepage.dart';
+import 'package:progetto_wearable/diary.dart';
+import 'package:progetto_wearable/data.dart';
 
-class Diary extends StatelessWidget {
-  Diary({Key? key}) : super(key: key);
+class Login extends StatelessWidget {
+  Login({Key? key}) : super(key: key);
 
-  static const routename = 'HomePage';
+  static const route = '/login/';
+  static const routename = 'LoginPage';
 
   @override
   Widget build(BuildContext context) {
-    print('HomePage_temp built');
 
     return Scaffold(
       appBar: AppBar(
@@ -23,35 +25,9 @@ class Diary extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "How do you feel today?",
+              "Enter your credentials",
               style: TextStyle(  
               fontSize: 18)),
-              SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  iconSize: 60,
-                  icon: const Icon(Icons.sentiment_very_satisfied),
-                  onPressed: () {},
-                  color: Colors.green,
-                  ),
-                IconButton(
-                  iconSize: 60,
-                  icon: const Icon(Icons.sentiment_neutral),
-                  onPressed: () {},
-                  color: Colors.orange,
-                  ),                  
-                IconButton(
-                  iconSize: 60,
-                  icon: const Icon(Icons.sentiment_very_dissatisfied),
-                  onPressed: () {},
-                  color: Colors.red,
-                  ),
-              ]
-            ),
             SizedBox(
               height: 40,
             ),
@@ -70,7 +46,7 @@ class Diary extends StatelessWidget {
                     hintText: 'Username',
                     hintStyle: TextStyle(
                       fontSize: 16.0,
-                      color: Colors.white,
+                      color: Colors.grey,
                     ),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 16.0,
@@ -95,10 +71,10 @@ class Diary extends StatelessWidget {
               height: 70,
             ),
             Container(
-              width: 250.0,
+              width: 300.0,
               child: 
                 TextField(
-                  maxLines: 1,
+                  maxLines: 5,
                   obscureText: true,
                   obscuringCharacter: "*",
                   style: TextStyle(
@@ -111,7 +87,7 @@ class Diary extends StatelessWidget {
                     hintText: 'Password',
                     hintStyle: TextStyle(
                       fontSize: 16.0,
-                      color: Colors.white,
+                      color: Colors.grey,
                     ),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 16.0,
@@ -136,14 +112,18 @@ class Diary extends StatelessWidget {
               height: 50,
             ),
             ElevatedButton(
-                onPressed: (){},
+                onPressed: (){
+                //TO DO: implementazione logica di controllo, per il momento
+                //fa fare sempre il login
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   fixedSize: const Size(200, 70),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
                 child: Text(
-                  'Submit',
+                  'Login',
                   style: TextStyle(  
                     fontSize: 25)),  
                     ),
@@ -152,4 +132,4 @@ class Diary extends StatelessWidget {
       ),
     );
   } //build
-} //HomePage
+} //Homepage

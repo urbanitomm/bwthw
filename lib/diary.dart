@@ -1,12 +1,16 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:progetto_wearable/data.dart';
+import 'package:progetto_wearable/test_home.dart';
+import 'package:progetto_wearable/homepage.dart';
+import 'package:progetto_wearable/diary.dart';
+import 'package:progetto_wearable/login.dart';
+import 'package:progetto_wearable/data.dart';
 
 class Diary extends StatelessWidget {
   Diary({Key? key}) : super(key: key);
 
-  static const routename = 'HomePage';
+    static const route = '/dairy/';
+  static const routename = 'Diary';
 
   @override
   Widget build(BuildContext context) {
@@ -47,19 +51,22 @@ class Diary extends StatelessWidget {
                   icon: const Icon(Icons.sentiment_very_dissatisfied),
                   onPressed: () {},
                   ),
-              ]
-            ),
+              
             SizedBox(
               height: 100,
             ),
+            Container(
+              width: 300.0,
+              child:
                 TextField(
+                  maxLines: 4,
                   style: TextStyle(
                     fontSize: 16.0,
                     color: Colors.black,
                   ),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[200],
+                    fillColor: Colors.grey[100],
                     hintText: 'Enter your text',
                     hintStyle: TextStyle(
                       fontSize: 16.0,
@@ -84,19 +91,22 @@ class Diary extends StatelessWidget {
                         width: 2.0,
                       ),
                     ),
-                    prefixIcon: Icon(
-                      Icons.person,
+                    suffixIcon:IconButton(
+                      icon: Icon(Icons.clear),
                       color: Colors.grey[400],
+                      onPressed: (){
+                      //TO DO: cancellazione del contenuto text box
+                      }),
                     ),
-                    suffixIcon:Icon(
-                      Icons.clear,
-                      color: Colors.grey[400],
-                    ),)),
+                  )),
+          
             SizedBox(
               height: 50,
             ),
             ElevatedButton(
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   fixedSize: const Size(200, 70),
@@ -109,7 +119,7 @@ class Diary extends StatelessWidget {
                     ),
           ],
         ),
-      ),
-    );
+      ]),
+    ));
   } //build
 } //HomePage
