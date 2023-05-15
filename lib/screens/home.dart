@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:progetto_wearable/screens/contacts.dart';
 import 'package:progetto_wearable/screens/data.dart';
 import 'package:progetto_wearable/screens/test_home.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
@@ -46,7 +47,7 @@ class Home extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: (){
-                  //TO DO: navigation to contact page
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Contacts()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,

@@ -6,7 +6,7 @@ import 'package:progetto_wearable/screens/login.dart';
 class Diary extends StatelessWidget {
   Diary({Key? key}) : super(key: key);
 
-    static const route = '/dairy/';
+    static const route = '/diary/';
   static const routename = 'Diary';
 
   @override
