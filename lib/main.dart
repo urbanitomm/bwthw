@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:progetto_wearable/data.dart';
-import 'package:progetto_wearable/test_home.dart';
-import 'package:progetto_wearable/homepage.dart';
-import 'package:progetto_wearable/diary.dart';
-import 'package:progetto_wearable/login.dart';
-import 'package:progetto_wearable/data.dart';
+import 'package:progetto_wearable/screens/data.dart';
+import 'package:progetto_wearable/screens/test_home.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:progetto_wearable/screens/home.dart';
+import 'package:progetto_wearable/screens/diary.dart';
+import 'package:progetto_wearable/screens/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Diary(),
+        home: Login(),
     );
   } //build
 }//MyApp

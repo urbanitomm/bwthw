@@ -36,8 +36,8 @@ dependencies:
   graphic: ^1.0.1
   provider: ^6.0.5
   shared_preferences: ^2.0.17
-  dio: ^5.0.0
   jwt_decoder: ^2.0.1
+  syncfusion_flutter_calendar: ^21.2.4 
 
 
   # The following adds the Cupertino Icons font to your application.

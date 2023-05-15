@@ -1,10 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:progetto_wearable/screens/data.dart';
+import 'package:progetto_wearable/screens/test_home.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:progetto_wearable/screens/diary.dart';
+import 'package:progetto_wearable/screens/login.dart';
 
-class Homepage extends StatelessWidget {
-  Homepage({Key? key}) : super(key: key);
+class Home extends StatelessWidget {
+  Home({Key? key}) : super(key: key);
 
   static const route = '/homepage/';
   static const routename = 'HomePage';
@@ -14,23 +16,6 @@ class Homepage extends StatelessWidget {
     print('HomePage built');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('App name'),
-        leading: Icon(Icons.menu),
-        leadingWidth: 100,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart),
-            label: 'Data',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Diary',
-          ),
-        ],
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +29,9 @@ class Homepage extends StatelessWidget {
               height: 100,
             ),
             ElevatedButton(
-                onPressed: (){},
+                onPressed: (){
+                  //To do: navigation to self report pag
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,
                   fixedSize: const Size(200, 70),
@@ -58,7 +45,9 @@ class Homepage extends StatelessWidget {
               height: 50,
             ),
             ElevatedButton(
-                onPressed: (){},
+                onPressed: (){
+                  //TO DO: navigation to contact page
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   fixedSize: const Size(200, 70),

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:progetto_wearable/data.dart';
-import 'package:progetto_wearable/test_home.dart';
-import 'package:progetto_wearable/homepage.dart';
-import 'package:progetto_wearable/diary.dart';
-import 'package:progetto_wearable/login.dart';
-import 'package:progetto_wearable/data.dart';
-
+import 'package:progetto_wearable/screens/data.dart';
+import 'package:progetto_wearable/screens/test_home.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:progetto_wearable/screens/login.dart';
 class Diary extends StatelessWidget {
   Diary({Key? key}) : super(key: key);
 
@@ -14,13 +11,13 @@ class Diary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('HomePage_temp built');
+    print('Diary built');
 
     return Scaffold(
       appBar: AppBar(
         title: Text('App name'),
-        //leading: Icon(Icons.menu),
-        //leadingWidth: 100,
+        leading: Icon(Icons.menu),
+        leadingWidth: 100,
       ),
       body: Center(
         child: Column(
@@ -51,7 +48,7 @@ class Diary extends StatelessWidget {
                   icon: const Icon(Icons.sentiment_very_dissatisfied),
                   onPressed: () {},
                   ),
-              
+          ]),
             SizedBox(
               height: 100,
             ),
@@ -119,7 +116,7 @@ class Diary extends StatelessWidget {
                     ),
           ],
         ),
-      ]),
-    ));
+      ),
+    );
   } //build
 } //HomePage

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:progetto_wearable/homepage.dart';
-import 'package:progetto_wearable/diary.dart';
-import 'package:progetto_wearable/data.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:progetto_wearable/screens/diary.dart';
+import 'package:progetto_wearable/screens/data.dart';
 
 class Login extends StatelessWidget {
   Login({Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ class Login extends StatelessWidget {
               height: 40,
             ),
             Container(
-              width: 250.0,
+              width: 275.0,
               child: 
                 TextField(
                   maxLines: 1,
@@ -68,13 +68,12 @@ class Login extends StatelessWidget {
                       ),
                     ),)),),
             SizedBox(
-              height: 70,
+              height: 40,
             ),
             Container(
-              width: 300.0,
+              width: 275.0,
               child: 
                 TextField(
-                  maxLines: 5,
                   obscureText: true,
                   obscuringCharacter: "*",
                   style: TextStyle(
@@ -109,13 +108,13 @@ class Login extends StatelessWidget {
                       ),
                     ),)),),
             SizedBox(
-              height: 50,
+              height: 60,
             ),
             ElevatedButton(
                 onPressed: (){
                 //TO DO: implementazione logica di controllo, per il momento
                 //fa fare sempre il login
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Diary()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
