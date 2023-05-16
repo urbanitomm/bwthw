@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/data.dart';
-import 'package:progetto_wearable/screens/test_home.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/screens/home.dart';
 import 'package:progetto_wearable/screens/diary.dart';

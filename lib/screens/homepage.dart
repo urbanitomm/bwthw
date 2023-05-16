@@ -66,10 +66,48 @@ class _HomeState extends State<Homepage> {
     print('HomePage built');
 
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Stack(
+                children: [
+                  UserAccountsDrawerHeader(
+                    accountName: Text("Luca"),
+                    accountEmail: Text("luca@virgilio.it"),
+                    //TODO: aggiungere foto profilo
+                    currentAccountPicture: CircleAvatar(
+                    //backgroundImage: NetworkImage(
+                    //"https://appmaking.co/wp-content/uploads/2021/08/appmaking-logo-colored.png"),
+              ),)
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.account_box),
+              title: Text("Profile"),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text("Options"),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("Logout"),
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: Text('App name'),
-        leading: Icon(Icons.menu),
-        leadingWidth: 100,
+        //leading: Icon(Icons.menu),
+        //leadingWidth: 100,
       ),
       bottomNavigationBar: BottomNavigationBar(
             items: navBarItems,
