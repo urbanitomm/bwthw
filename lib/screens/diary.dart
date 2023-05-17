@@ -4,16 +4,24 @@ import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/screens/login.dart';
-class Diary extends StatelessWidget {
-  Diary({Key? key}) : super(key: key);
 
-    static const route = '/diary/';
+class Diary extends StatefulWidget {
+  const Diary({Key? key}) : super(key: key);
+
+  static const route = '/diary/';
   static const routename = 'Diary';
 
   @override
+  State<Diary> createState() => _DiaryState();
+}
+class _DiaryState extends State<Diary>  {
+
+  bool _happyPressed = false;
+  bool _neutralPressed = false;
+  bool _sadPressed = false;
+  @override
   Widget build(BuildContext context) {
     print('Diary built');
-
     return Scaffold(
       appBar: MyAppbar(),
       drawer: MyDrawer(),
@@ -33,18 +41,45 @@ class Diary extends StatelessWidget {
               children: [
                 IconButton(
                   iconSize: 60,
-                  icon: const Icon(Icons.sentiment_very_satisfied),
-                  onPressed: () {},
+                  icon: Icon(
+                    Icons.sentiment_very_satisfied,
+                    color: _happyPressed ? Colors.green : Colors.black,
+                    ),
+                  onPressed: () {
+                    setState((){
+                          _happyPressed = true;
+                          _neutralPressed = false;
+                          _sadPressed = false;
+                        });
+                  },
                   ),
                 IconButton(
                   iconSize: 60,
-                  icon: const Icon(Icons.sentiment_neutral),
-                  onPressed: () {},
+                  icon: Icon(
+                    Icons.sentiment_neutral,
+                    color: _neutralPressed ? Colors.orange : Colors.black,
+                    ),
+                  onPressed: () {
+                    setState((){
+                          _happyPressed = false;
+                          _neutralPressed = true;
+                          _sadPressed = false;
+                        });
+                  },
                   ),                  
                 IconButton(
                   iconSize: 60,
-                  icon: const Icon(Icons.sentiment_very_dissatisfied),
-                  onPressed: () {},
+                  icon: Icon(
+                    Icons.sentiment_very_dissatisfied,
+                    color: _sadPressed ? Colors.red : Colors.black,
+                    ),
+                  onPressed: () {
+                    setState((){
+                          _happyPressed = false;
+                          _neutralPressed = false;
+                          _sadPressed = true;
+                        });
+                  },
                   ),
           ]),
             SizedBox(
