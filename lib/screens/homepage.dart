@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:progetto_wearable/utils/mydrawer.dart';
+import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/calendar.dart';
 import 'package:progetto_wearable/screens/data.dart';
@@ -67,11 +68,7 @@ class _HomeState extends State<Homepage> {
 
     return Scaffold(
       drawer: MyDrawer(),
-      appBar: AppBar(
-        title: Text('App name'),
-        //leading: Icon(Icons.menu),
-        //leadingWidth: 100,
-      ),
+      appBar: MyAppbar(),
       bottomNavigationBar: BottomNavigationBar(
             items: navBarItems,
             currentIndex: _selIdx,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/data.dart';
+import 'package:progetto_wearable/utils/mydrawer.dart';
+import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/screens/login.dart';
 class Diary extends StatelessWidget {
@@ -13,11 +15,8 @@ class Diary extends StatelessWidget {
     print('Diary built');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('App name'),
-        //leading: Icon(Icons.menu),
-        //leadingWidth: 100,
-      ),
+      appBar: MyAppbar(),
+      drawer: MyDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

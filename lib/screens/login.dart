@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:progetto_wearable/utils/mydrawer.dart';
+import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/diary.dart';
 import 'package:progetto_wearable/screens/data.dart';
 
@@ -15,11 +17,7 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('App name'),
-        //leading: Icon(Icons.menu),
-        //leadingWidth: 100,
-      ),
+      appBar: MyAppbar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

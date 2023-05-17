@@ -1,6 +1,8 @@
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:progetto_wearable/utils/mydrawer.dart';
+import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/data.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/screens/diary.dart';
@@ -16,7 +18,7 @@ class Calendar extends StatelessWidget {
   Widget build(BuildContext context) {
     print('Calendar built');
     return Scaffold(
-    /* Lascio qui l'app bar nel caso torni utile copiarla
+      /* Lascio qui l'app bar nel caso torni utile copiarla
       appBar: AppBar(
         title: Text('App Name'),
         leading: IconButton(
