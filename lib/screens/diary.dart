@@ -135,7 +135,7 @@ class _DiaryState extends State<Diary>  {
             ),
             ElevatedButton(
                 onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Homepage()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

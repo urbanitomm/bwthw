@@ -112,7 +112,7 @@ class Login extends StatelessWidget {
                 onPressed: (){
                 //TO DO: implementazione logica di controllo, per il momento
                 //fa fare sempre il login
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Diary()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Diary()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
