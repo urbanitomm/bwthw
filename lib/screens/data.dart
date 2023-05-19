@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:progetto_wearable/utils/mydrawer.dart';
-import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
