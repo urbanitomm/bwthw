@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/calendar.dart';
 import 'package:progetto_wearable/screens/data.dart';
-import 'package:progetto_wearable/screens/diary.dart';
 import 'package:progetto_wearable/screens/home.dart';
+import 'package:progetto_wearable/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Homepage extends StatefulWidget {
