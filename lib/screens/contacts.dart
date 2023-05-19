@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:progetto_wearable/screens/data.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
-import 'package:progetto_wearable/screens/homepage.dart';
-import 'package:progetto_wearable/screens/login.dart';
 class Contacts extends StatelessWidget {
   Contacts({Key? key}) : super(key: key);
 
