@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:progetto_wearable/screens/data.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
-import 'package:progetto_wearable/screens/login.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
-import 'package:progetto_wearable/screens/diary.dart';
 
 class SelfReport extends StatelessWidget {
   SelfReport({Key? key}) : super(key: key);
