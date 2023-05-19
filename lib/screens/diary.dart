@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:progetto_wearable/screens/home.dart';
+import 'package:progetto_wearable/screens/login.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Diary extends StatefulWidget {
   const Diary({Key? key}) : super(key: key);
@@ -9,14 +12,27 @@ class Diary extends StatefulWidget {
   static const route = '/diary/';
   static const routename = 'Diary';
 
+  
+
   @override
   State<Diary> createState() => _DiaryState();
 }
 class _DiaryState extends State<Diary>  {
 
+
   bool _happyPressed = false;
   bool _neutralPressed = false;
   bool _sadPressed = false;
+  String? _entryMood = null;
+  String? _entryText = null;
+  final snackBarText = const SnackBar(
+    content: Text('You should write something'),
+  );
+  final snackBarMood = const SnackBar(
+    content: Text('You should pick a mood'),
+  );
+
+
   @override
   Widget build(BuildContext context) {
     print('Diary built');
@@ -48,6 +64,7 @@ class _DiaryState extends State<Diary>  {
                           _happyPressed = true;
                           _neutralPressed = false;
                           _sadPressed = false;
+                          _entryMood = 'Happy';
                         });
                   },
                   ),
@@ -62,6 +79,7 @@ class _DiaryState extends State<Diary>  {
                           _happyPressed = false;
                           _neutralPressed = true;
                           _sadPressed = false;
+                          _entryMood = 'Neutral';
                         });
                   },
                   ),                  
@@ -76,6 +94,7 @@ class _DiaryState extends State<Diary>  {
                           _happyPressed = false;
                           _neutralPressed = false;
                           _sadPressed = true;
+                          _entryMood = 'Sad';
                         });
                   },
                   ),
@@ -88,6 +107,9 @@ class _DiaryState extends State<Diary>  {
               child:
                 TextField(
                   maxLines: 4,
+                  onChanged: (text) {  
+                    _entryText = text;  
+                  },
                   style: TextStyle(
                     fontSize: 16.0,
                     color: Colors.black,
@@ -133,7 +155,7 @@ class _DiaryState extends State<Diary>  {
             ),
             ElevatedButton(
                 onPressed: (){
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Homepage()));
+                  _entryCheck(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -150,6 +172,38 @@ class _DiaryState extends State<Diary>  {
       ),
     );
   } //build
+
+  
+  void _entryCheck(BuildContext context) async{
+  SharedPreferences sp = await SharedPreferences.getInstance();
+
+     if(_entryMood == null) { //Se non c'è il mood appare la snackbar appropriata
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMood);
+
+     }else if(_entryText == '' || _entryText == null){ //Se non c'è testo appare la snackbar appropriata
+      ScaffoldMessenger.of(context).showSnackBar(snackBarText);
+    
+    }else{ //Se c'è testo non appare la snackbar ed attribuisco alla entry di oggi, il testo
+    sp.setString(sp.getString('lastEntryDate')!, _entryText!);
+    sp.setString(sp.getString('lastEntryDate')!+'M', _entryMood!);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Homepage()), (route) => false);
+    }
+  }
 } //HomePage
+
+/*
+DA METTERE SE CI SONO PROBLEMI
+
+//Check ulteriore nel caso l'utente finisce accidentalmente nel 
+  void _checkLegitimacy(context)async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    if(sp.getBool('firstEntryOfToday')!){
+      sp.setBool('firstEntryOfToday', false);
+    }else{
+      print('UNINTENDED ACCESS IN THE DIARY PAGE!!!');
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home()));
+    }
+  }
+  */
 
 

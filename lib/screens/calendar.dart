@@ -1,4 +1,6 @@
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:progetto_wearable/screens/diary.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -81,7 +83,8 @@ class ScheduleExample extends State<CustomAgenda> {
                               leading: Column(
                                 children: <Widget>[
                                   Container(
-                                  child: Icon(
+                                  child: 
+                                  Icon(
                                     getIcon(_appointmentDetails[index].subject),
                                     size: 30,
                                     color: Colors.white,
@@ -139,9 +142,6 @@ class ScheduleExample extends State<CustomAgenda> {
 
   _DataSource getCalendarDataSource() {
     final List<Appointment> appointments = <Appointment>[];
-
-
-
     appointments.add(Appointment(
         startTime: DateTime.now().add(const Duration(hours: 4, days: -1)),
         endTime: DateTime.now().add(const Duration(hours: 5, days: -1)),
@@ -151,13 +151,17 @@ class ScheduleExample extends State<CustomAgenda> {
         // Appena saranno attivate le shared preferences usare getColor(),
         isAllDay: true));
 
+    //String entry;
+    //Future <String> futureEntry = getEntry();
+
+    getEntry().then((entries) {
     appointments.add(Appointment(
       startTime: DateTime.now(),
       endTime: DateTime.now().add(const Duration(hours: 1)),
-      subject: 'Neutral',
+      subject: entries[1],
       color: Colors.orange,
-      // Appena saranno attivate le shared preferences usare getColor(),
     ));
+  });
 
     appointments.add(Appointment(
       startTime: DateTime.now().add(const Duration(days: -2, hours: 4)),
@@ -170,7 +174,7 @@ class ScheduleExample extends State<CustomAgenda> {
   }
 
   
-
+  
   IconData getIcon(String subject) {
     if (subject == ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at egestas nulla, ut volutpat urna. Ut et urna sit amet sapien dictum porta sit amet vel mi. Duis quam augue, ultricies at erat et, tincidunt vehicula elit. Mauris elit mauris, vestibulum sit amet magna a, rhoncus volutpat lectus. Nullam urna erat, molestie sit amet massa in, congue imperdiet dolor. In mattis sed diam vitae tempus. Donec blandit, lorem sed ultricies viverra, mauris enim venenatis eros, ac rutrum sem libero eu est. Nulla ultricies at turpis vel pellentesque. Etiam lacinia ultricies tortor porta hendrerit. Phasellus varius neque lorem, vitae suscipit turpis imperdiet vitae. Curabitur vitae ipsum quis erat efficitur porta at vel dui. Aliquam cursus, nunc non consectetur luctus, risus elit sollicitudin sapien, vel iaculis nulla felis vitae mi. Nulla fringilla augue lacinia ultricies vehicula. Ut sem odio, convallis eu rhoncus viverra, finibus id neque. Nulla molestie turpis eu diam dictum aliquam sed a massa. Quisque sed consectetur mi. Vestibulum id lacinia quam. Ut iaculis, massa ut dignissim dignissim, nunc odio fringilla leo, sed varius massa elit vitae metus. Aenean quis sapien et nunc malesuada suscipit sed rhoncus enim. Maecenas in suscipit risus, vestibulum malesuada libero. Duis turpis justo, suscipit vel rhoncus quis, accumsan id nisl. Sed vestibulum, nisi quis consectetur sodales, nunc justo auctor nisi, non fermentum augue tellus et purus. Ut ut semper elit. Sed et ipsum aliquam, luctus lorem a, accumsan erat. Sed tincidunt nisl sit amet libero congue sagittis. ') {
       return Icons.sentiment_very_satisfied;
@@ -181,18 +185,32 @@ class ScheduleExample extends State<CustomAgenda> {
     } else {
       return Icons.sentiment_very_satisfied;
     }
-  }
+  } 
 
-  getColor() {
-    if (_happyPressed) {
+  getColor(mood) {
+    if (mood == 'Happy') {
       return Colors.green;
-    } else if (_neutralPressed) {
+    } else if (mood == 'Neutral') {
       return Colors.orange;
-    } else if (_sadPressed) {
+    } else if (mood == 'Sad') {
       return Colors.red;
     } else {
-      return Colors.green;
+      print('Qualcosa è andato storto nella selezione del colore');
+      return Colors.black;
     }
+  }
+
+  //Passo alla funzione che crea la lista di 'appuntamenti' la coppia test+colore di modo da
+  //poter creare la entry in maniera corretta
+  Future<String> getEntry()async{
+  SharedPreferences sp = await SharedPreferences.getInstance();
+  final String retrievedText = sp.getString(sp.getString('lastEntryDate')!)!;
+  print('retrievedText');
+  final String retrievedMood = sp.getString(sp.getString('lastEntryDate')!+'M')!;
+  print('retrievedMood');
+  final Color retrievedColor = getColor(retrievedMood);
+  //final List entries = [retrievedText,retrievedColor];
+  return retrievedText;
   }
 }
 
@@ -201,6 +219,7 @@ class _DataSource extends CalendarDataSource {
     appointments = source;
   }
 }
+
 
 
 
@@ -262,3 +281,4 @@ List<DiaryEntry> _getDataSource() {
   return appointments;
 }
 */
+

@@ -1,128 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:progetto_wearable/screens/home.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/diary.dart';
+import 'package:flutter_login/flutter_login.dart';
+import'package:intl/intl.dart';
 
-class Login extends StatelessWidget {
-  Login({Key? key}) : super(key: key);
-
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
   static const route = '/login/';
   static const routename = 'LoginPage';
 
   @override
-  Widget build(BuildContext context) {
+  State<Login> createState() => _LoginPage();
+}
+class _LoginPage extends State<Login>{
+  
+    @override
+  void initState() {
+    super.initState();
+    print('checking...');
+    //Check if the user is already logged in before rendering the login page
+    _checkLogin();
+    print('checked...');
+  }//initState
 
-    return Scaffold(
-      appBar: MyAppbar(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Enter your credentials",
-              style: TextStyle(  
-              fontSize: 18)),
-            SizedBox(
-              height: 40,
-            ),
-            Container(
-              width: 275.0,
-              child: 
-                TextField(
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Username',
-                    hintStyle: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey,
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 16.0,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2.0,
-                      ),
-                    ),)),),
-            SizedBox(
-              height: 40,
-            ),
-            Container(
-              width: 275.0,
-              child: 
-                TextField(
-                  obscureText: true,
-                  obscuringCharacter: "*",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Password',
-                    hintStyle: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey,
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 16.0,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2.0,
-                      ),
-                    ),)),),
-            SizedBox(
-              height: 60,
-            ),
-            ElevatedButton(
-                onPressed: (){
-                //TO DO: implementazione logica di controllo, per il momento
-                //fa fare sempre il login
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Diary()));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  fixedSize: const Size(200, 70),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30))),
-                child: Text(
-                  'Login',
-                  style: TextStyle(  
-                    fontSize: 25)),  
-                    ),
-          ],
-        ),
-      ),
+  void _checkLogin() async {
+    //Get the SharedPreference instance and check if the value of the 'username' filed is set or not
+    final sp = await SharedPreferences.getInstance();
+    if(sp.getString('username') == '1234@5678.com'){
+      //If 'username is set, push the HomePage
+      print('case 1');
+      _toDiaryPage(context);
+    }//if
+  }//_checkLogin
+
+  Future<String> _loginUser(LoginData data) async {
+    if(data.name == '1234@5678.com' && data.password == '123456'){
+
+      final sp = await SharedPreferences.getInstance();
+      sp.setString('username', data.name);
+
+      return '';
+    } else {
+      return 'Wrong credentials';
+    }
+  } 
+ // _loginUser
+  Future<String> _signUpUser(SignupData data) async {
+    return 'To be implemented';
+  } 
+ // _signUpUser
+  Future<String> _recoverPassword(String email) async {
+    return 'Recover password functionality needs to be implemented';
+  } 
+ // _recoverPassword
+  @override
+  Widget build(BuildContext context) {
+    print('Build login');
+    return FlutterLogin(
+      title: 'App_name',
+      onLogin: _loginUser,
+      onSignup: _signUpUser,
+      onRecoverPassword: _recoverPassword,
+      onSubmitAnimationCompleted: () async{
+        _toDiaryPage(context);
+      },
     );
-  } //build
-} //Homepage
+  } // build
+
+  //Codice per passare alla pagina del diario
+  void _toDiaryPage(BuildContext context) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    //Se non ho mai scritto nel diario inizializzo la variabile che mi dice l'ultima data in cui ho scritto
+    if(sp.containsKey('lastEntryDate') == false){
+      //La gestisco in formato stringa perchè è meglio compatibile con altri metodi
+      sp.setString('lastEntryDate', todayDate);
+      print("('lastEntryDate') == false");
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Diary()));
+
+    //Se oggi ho gia scritto non vado al diario
+    } else if(sp.getString('lastEntryDate') == todayDate){
+      //Variabile potenzialmente inutile, basta non andare mai al diario
+      //Potrebbe essere usata come sicurezza in più se l'utente accede in modo
+      //non intenzionale alla pagina
+      sp.setBool('firstEntryOfToday', false); 
+      print("Oggi ho gia scritto");
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Homepage()));
+
+    //Se oggi non ho gia scritto aggiorno la variabile e vado al diario
+    } else{
+      sp.setString('lastEntryDate', todayDate);
+      //Variabile potenzialmente inutile, basta non andare mai al diario
+      sp.setBool('firstEntryOfToday', true); 
+      print('"Oggi non ho gia scritto"');
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Diary()));
+    }    
+  }
+  
+  } // LoginScreen

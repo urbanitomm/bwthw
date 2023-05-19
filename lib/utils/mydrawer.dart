@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/profile.dart';
 import 'package:progetto_wearable/screens/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyDrawer extends StatelessWidget {
   @override
@@ -40,16 +41,28 @@ class MyDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.logout),
               title: Text("Logout"),
-              onTap: () {
-                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Login()), (route) => false);
-              },
+              onTap: () async{
+                //Al logout pulisco le shared preferences 
+                SharedPreferences sp = await SharedPreferences.getInstance();
+                await sp.clear();
+                print('SP cleaned');
+                _toLoginPage(context);
+              }
             ),
           ],
         ),
       );
       
   }
+  
+  void _toLoginPage(BuildContext context) async{
+    //Unset the 'username' filed in SharedPreference 
+    final sp = await SharedPreferences.getInstance();
+    sp.remove('username');
 
+    //Then pop the HomePage
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Login()), (route) => false);
+  }//_toCalendarPage
 }
 
 
