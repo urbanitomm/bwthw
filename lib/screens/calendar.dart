@@ -78,6 +78,10 @@ class CalendarDiary extends State<CustomAgenda>  {
           //The logic is to query the DB for the entire list of Todo using dbr.findAllTodos()
           //and then populate the ListView accordingly.
           //We need to use a FutureBuilder since the result of dbr.findAllTodos() is a Future.  
+
+          //PROBLEMA: il futurebuilder viene chiamato prima della conclusione della inizializzazione di datasource
+          //dato che datasource richiede dei dati ottenuti in maniera asincrona ma l'attribuzione stessa non è asincrona
+          //questo fa chiamare il futurebuilder un istante prima del momento opportuno impedendo il caricamento corretto della pagina
           return FutureBuilder(
             initialData: null,
             future: dbr.findAllEntries(),
