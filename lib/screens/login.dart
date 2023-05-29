@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:progetto_wearable/database/entities/diaryentry.dart';
 import 'package:progetto_wearable/screens/home.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:progetto_wearable/repository/databaseRepository.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
+import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:progetto_wearable/screens/diary.dart';
 import 'package:flutter_login/flutter_login.dart';
-import'package:intl/intl.dart';
+import 'package:progetto_wearable/database/prepopulation.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -72,32 +76,35 @@ class _LoginPage extends State<Login>{
 
   //Codice per passare alla pagina del diario
   void _toDiaryPage(BuildContext context) async {
+
     SharedPreferences sp = await SharedPreferences.getInstance();
-    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     //Se non ho mai scritto nel diario inizializzo la variabile che mi dice l'ultima data in cui ho scritto
     if(sp.containsKey('lastEntryDate') == false){
       //La gestisco in formato stringa perchè è meglio compatibile con altri metodi
-      sp.setString('lastEntryDate', todayDate);
+      sp.setString('lastEntryDate', getTodayDate());
+      sp.setBool('firstEntryOfToday', true);
       print("('lastEntryDate') == false");
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Diary()));
+      //Prepopolazione del database prima del primo ingresso in app
+      await prepopulate(context);
+      print('Populated');
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Diary()));
 
     //Se oggi ho gia scritto non vado al diario
-    } else if(sp.getString('lastEntryDate') == todayDate){
+    } else if(sp.getString('lastEntryDate') == getTodayDate()){
       //Variabile potenzialmente inutile, basta non andare mai al diario
-      //Potrebbe essere usata come sicurezza in più se l'utente accede in modo
-      //non intenzionale alla pagina
+      //Potrebbe essere usata come sicurezza in più se l'utente accede in modo non intenzionale alla pagina
       sp.setBool('firstEntryOfToday', false); 
       print("Oggi ho gia scritto");
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Homepage()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Homepage()));
 
     //Se oggi non ho gia scritto aggiorno la variabile e vado al diario
     } else{
-      sp.setString('lastEntryDate', todayDate);
+      sp.setString('lastEntryDate', getTodayDate());
       //Variabile potenzialmente inutile, basta non andare mai al diario
       sp.setBool('firstEntryOfToday', true); 
-      print('"Oggi non ho gia scritto"');
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Diary()));
+      print('"Oggi non ho ancora scritto"');
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Diary()));
     }    
   }
   

@@ -5,6 +5,10 @@ import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:progetto_wearable/repository/databaseRepository.dart';
+import 'package:provider/provider.dart';
+import 'package:progetto_wearable/database/entities/diaryentry.dart';
+import 'package:progetto_wearable/utils/funcs.dart';
 
 class Diary extends StatefulWidget {
   const Diary({Key? key}) : super(key: key);
@@ -12,19 +16,19 @@ class Diary extends StatefulWidget {
   static const route = '/diary/';
   static const routename = 'Diary';
 
-  
-
   @override
   State<Diary> createState() => _DiaryState();
 }
 class _DiaryState extends State<Diary>  {
 
-
+  //Variabili ridondanti, prima della consegna potremo toglierle
   bool _happyPressed = false;
   bool _neutralPressed = false;
   bool _sadPressed = false;
+
   String? _entryMood = null;
   String? _entryText = null;
+
   final snackBarText = const SnackBar(
     content: Text('You should write something'),
   );
@@ -175,18 +179,23 @@ class _DiaryState extends State<Diary>  {
 
   
   void _entryCheck(BuildContext context) async{
-  SharedPreferences sp = await SharedPreferences.getInstance();
-
+  
      if(_entryMood == null) { //Se non c'è il mood appare la snackbar appropriata
       ScaffoldMessenger.of(context).showSnackBar(snackBarMood);
 
      }else if(_entryText == '' || _entryText == null){ //Se non c'è testo appare la snackbar appropriata
       ScaffoldMessenger.of(context).showSnackBar(snackBarText);
     
-    }else{ //Se c'è testo non appare la snackbar ed attribuisco alla entry di oggi, il testo
-    sp.setString(sp.getString('lastEntryDate')!, _entryText!);
-    sp.setString(sp.getString('lastEntryDate')!+'M', _entryMood!);
+    }else{ //Se c'è testo non appare la snackbar ed attribuisco il testo alla entry di oggi 
+    await Provider.of<DatabaseRepository>(context, listen: false)
+                .insertDiaryentry(Diaryentry(getTodayDate(),_entryText!, _entryMood!));
+    
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Homepage()), (route) => false);
+    
+    //Diario con uso sp, deprecated
+    //SharedPreferences sp = await SharedPreferences.getInstance();
+    //sp.setString(sp.getString('lastEntryDate')!, _entryText!);
+    //sp.setString(sp.getString('lastEntryDate')!+'M', _entryMood!);
     }
   }
 } //HomePage

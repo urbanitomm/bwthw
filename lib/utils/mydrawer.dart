@@ -44,7 +44,7 @@ class MyDrawer extends StatelessWidget {
               onTap: () async{
                 //Al logout pulisco le shared preferences 
                 SharedPreferences sp = await SharedPreferences.getInstance();
-                await sp.clear();
+                await sp..remove("username");
                 print('SP cleaned');
                 _toLoginPage(context);
               }
