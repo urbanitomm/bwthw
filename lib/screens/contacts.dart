@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
+import 'package:progetto_wearable/utils/funcs.dart';
+
 class Contacts extends StatelessWidget {
-  Contacts({Key? key}) : super(key: key);
+  const Contacts({Key? key}) : super(key: key);
 
   static const route = '/contacts/';
   static const routename = 'Contacts';
@@ -12,45 +14,53 @@ class Contacts extends StatelessWidget {
     print('Diary built');
 
     return Scaffold(
-      appBar: MyAppbar(),
-      drawer: MyDrawer(),
+      appBar: const MyAppbar(),
+      drawer: const MyDrawer(),
       body: Center(
         child: Column(
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Icon(Icons.medical_services),
-                Column(
+                const Icon(Icons.medical_services),
+                const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Dott.ssa Rossi",
+                      "Dott. Rossi",
                       style: TextStyle(  
                       fontSize: 20)
                     ),
                     Text(
-                      "333 444555666",
+                      "333 44455566",
                       style: TextStyle(  
                       fontSize: 18)
                     ),
                 ],
                 ),
-              Icon(Icons.call),
+              IconButton(
+                  iconSize: 25,
+                  icon: const Icon(
+                    Icons.call,
+                    color: Colors.green,
+                    ),
+                  onPressed: () async{
+                    call("33344455566");
+                  }),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Icon(Icons.person),
-                Column(
+                const Icon(Icons.person),
+                const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -65,17 +75,25 @@ class Contacts extends StatelessWidget {
                     ),
                 ],
                 ),
-                Icon(Icons.call),
+                IconButton(
+                  iconSize: 25,
+                  icon: const Icon(
+                    Icons.call,
+                    color: Colors.green,
+                    ),
+                  onPressed: () async{
+                    call("34587654321");
+                  }),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Icon(Icons.person),
-                Column(
+                const Icon(Icons.person),
+                const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -90,7 +108,16 @@ class Contacts extends StatelessWidget {
                     ),
                 ],
                 ),
-                Icon(Icons.call),
+                IconButton(
+                  iconSize: 25,
+                  icon: const Icon(
+                    Icons.call,
+                    color: Colors.green,
+                    ),
+                  onPressed: () async{
+                    call("36912345678");
+                  },
+                ),
               ],
             ),
           ],

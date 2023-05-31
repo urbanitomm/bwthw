@@ -3,7 +3,7 @@ import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 
 class SelfReport extends StatelessWidget {
-  SelfReport({Key? key}) : super(key: key);
+  const SelfReport({Key? key}) : super(key: key);
 
     static const route = '/selfreport/';
   static const routename = 'SelfReport';
@@ -12,29 +12,36 @@ class SelfReport extends StatelessWidget {
   Widget build(BuildContext context) {
     print('Selfreport built');
 
+    //One controller for each textfield
+    var textController1 = TextEditingController();
+    var textController2 = TextEditingController();
+    var textController3 = TextEditingController();
+
     return Scaffold(
-      appBar: MyAppbar(),
+      resizeToAvoidBottomInset: false,
+      appBar: const MyAppbar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Fill all fields",
               style: TextStyle(  
-              fontSize: 18)),
-              SizedBox(
+              fontSize: 22)),
+              const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
               height: 20,
             ),
             SizedBox(
-              height: 30,
-            ),
-            Container(
               width: 300.0,
               child:
                 TextField(
+                  controller: textController1,
                   maxLines: 4,
-                  style: TextStyle(
-                    fontSize: 16.0,
+                  style: const TextStyle(
+                    fontSize: 16,
                     color: Colors.black,
                   ),
                   decoration: InputDecoration(
@@ -42,10 +49,10 @@ class SelfReport extends StatelessWidget {
                     fillColor: Colors.grey[100],
                     hintText: 'How much alcohol did you consume?',
                     hintStyle: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: 16,
                       color: Colors.grey[400],
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       vertical: 16.0,
                       horizontal: 16.0,
                     ),
@@ -59,30 +66,31 @@ class SelfReport extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.blue,
                         width: 2.0,
                       ),
                     ),
                     suffixIcon:IconButton(
-                      icon: Icon(Icons.clear),
+                      icon: const Icon(Icons.clear),
                       color: Colors.grey[400],
                       onPressed: (){
-                      //TO DO: cancellazione del contenuto text box
+                      textController1.clear();
                       }),
                     ),
                   )),
           
-            SizedBox(
-              height: 50,
+            const SizedBox(
+              height: 30,
             ),
             Container(
               width: 300.0,
               child:
                 TextField(
+                  controller: textController2,
                   maxLines: 4,
-                  style: TextStyle(
-                    fontSize: 16.0,
+                  style: const TextStyle(
+                    fontSize: 16,
                     color: Colors.black,
                   ),
                   decoration: InputDecoration(
@@ -90,10 +98,10 @@ class SelfReport extends StatelessWidget {
                     fillColor: Colors.grey[100],
                     hintText: 'Where did you consume it?',
                     hintStyle: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: 16,
                       color: Colors.grey[400],
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       vertical: 16.0,
                       horizontal: 16.0,
                     ),
@@ -107,29 +115,30 @@ class SelfReport extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.blue,
                         width: 2.0,
                       ),
                     ),
                     suffixIcon:IconButton(
-                      icon: Icon(Icons.clear),
+                      icon: const Icon(Icons.clear),
                       color: Colors.grey[400],
                       onPressed: (){
-                      //TO DO: cancellazione del contenuto text box
+                      textController2.clear();
                       }),
                     ),
                   )),
-            SizedBox(
-              height: 50,
+            const SizedBox(
+              height: 30,
             ),
             Container(
               width: 300.0,
               child:
                 TextField(
+                  controller: textController3,
                   maxLines: 4,
-                  style: TextStyle(
-                    fontSize: 16.0,
+                  style: const TextStyle(
+                    fontSize: 16,
                     color: Colors.black,
                   ),
                   decoration: InputDecoration(
@@ -137,10 +146,10 @@ class SelfReport extends StatelessWidget {
                     fillColor: Colors.grey[100],
                     hintText: 'When did you consume it??',
                     hintStyle: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: 16,
                       color: Colors.grey[400],
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       vertical: 16.0,
                       horizontal: 16.0,
                     ),
@@ -154,21 +163,21 @@ class SelfReport extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.blue,
                         width: 2.0,
                       ),
                     ),
                     suffixIcon:IconButton(
-                      icon: Icon(Icons.clear),
+                      icon: const Icon(Icons.clear),
                       color: Colors.grey[400],
                       onPressed: (){
-                      //TO DO: cancellazione del contenuto text box
+                      textController3.clear();
                       }),
                     ),
                   )),
-            SizedBox(
-              height: 30,
+            const SizedBox(
+              height: 20,
             ),
             ElevatedButton(
                 onPressed: (){
@@ -179,11 +188,11 @@ class SelfReport extends StatelessWidget {
                   fixedSize: const Size(200, 70),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
-                child: Text(
-                  'Submit',
-                  style: TextStyle(  
-                    fontSize: 25)),  
-                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(  
+                        fontSize: 25)),  
+                  ),
           ],
         ),
       ),

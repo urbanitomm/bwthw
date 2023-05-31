@@ -3,7 +3,6 @@ import 'package:progetto_wearable/repository/databaseRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/screens/login.dart';
-import 'package:progetto_wearable/database/prepopulation.dart';
 
 
 Future<void> main() async {
@@ -23,15 +22,15 @@ Future<void> main() async {
   //That instance will be then shared through the platform and will be unique.
   runApp(ChangeNotifierProvider<DatabaseRepository>(
     create: (context) => databaseRepository,
-    child: MyApp(),
+    child: const MyApp(),
   ));
 } //main
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
         home: Login(),
     );
   } //build

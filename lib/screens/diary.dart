@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:progetto_wearable/screens/home.dart';
-import 'package:progetto_wearable/screens/login.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:progetto_wearable/repository/databaseRepository.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/database/entities/diaryentry.dart';
@@ -21,14 +18,18 @@ class Diary extends StatefulWidget {
 }
 class _DiaryState extends State<Diary>  {
 
-  //Variabili ridondanti, prima della consegna potremo toglierle
+  //Variables that control the mood 
+  //Booleans are easier to work with into the diary but we use a string to
+  //store more efficiently the mood into the database
   bool _happyPressed = false;
   bool _neutralPressed = false;
   bool _sadPressed = false;
 
-  String? _entryMood = null;
-  String? _entryText = null;
+  //Initialized as null
+  String? _entryMood;
+  String? _entryText;
 
+  //Shown if the user does not fill the entry
   final snackBarText = const SnackBar(
     content: Text('You should write something'),
   );
@@ -36,22 +37,23 @@ class _DiaryState extends State<Diary>  {
     content: Text('You should pick a mood'),
   );
 
+  var textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     print('Diary built');
     return Scaffold(
-      appBar: MyAppbar(),
-      drawer: MyDrawer(),
+      appBar: const MyAppbar(),
+      drawer: const MyDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "How do you feel today?",
               style: TextStyle(  
               fontSize: 18)),
-              SizedBox(
+              const SizedBox(
               height: 20,
             ),
             Row(
@@ -103,18 +105,19 @@ class _DiaryState extends State<Diary>  {
                   },
                   ),
           ]),
-            SizedBox(
+            const SizedBox(
               height: 100,
             ),
             Container(
               width: 300.0,
               child:
                 TextField(
+                  controller: textController,
                   maxLines: 4,
                   onChanged: (text) {  
                     _entryText = text;  
                   },
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16.0,
                     color: Colors.black,
                   ),
@@ -126,7 +129,7 @@ class _DiaryState extends State<Diary>  {
                       fontSize: 16.0,
                       color: Colors.grey[400],
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       vertical: 16.0,
                       horizontal: 16.0,
                     ),
@@ -140,21 +143,21 @@ class _DiaryState extends State<Diary>  {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.blue,
                         width: 2.0,
                       ),
                     ),
                     suffixIcon:IconButton(
-                      icon: Icon(Icons.clear),
+                      icon: const Icon(Icons.clear),
                       color: Colors.grey[400],
                       onPressed: (){
-                      //TO DO: cancellazione del contenuto text box
+                      textController.clear();
                       }),
                     ),
                   )),
           
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
             ElevatedButton(
@@ -166,7 +169,7 @@ class _DiaryState extends State<Diary>  {
                   fixedSize: const Size(200, 70),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
-                child: Text(
+                child: const Text(
                   'Submit',
                   style: TextStyle(  
                     fontSize: 25)),  
@@ -180,22 +183,18 @@ class _DiaryState extends State<Diary>  {
   
   void _entryCheck(BuildContext context) async{
   
-     if(_entryMood == null) { //Se non c'è il mood appare la snackbar appropriata
+     if(_entryMood == null) { //Snackbar for missing mood
       ScaffoldMessenger.of(context).showSnackBar(snackBarMood);
 
-     }else if(_entryText == '' || _entryText == null){ //Se non c'è testo appare la snackbar appropriata
+     }else if(_entryText == '' || _entryText == null){ //Snackbar for missing text
       ScaffoldMessenger.of(context).showSnackBar(snackBarText);
     
-    }else{ //Se c'è testo non appare la snackbar ed attribuisco il testo alla entry di oggi 
+    }else{ //If everything is ok i record the entry into the database
     await Provider.of<DatabaseRepository>(context, listen: false)
                 .insertDiaryentry(Diaryentry(getTodayDate(),_entryText!, _entryMood!));
     
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Homepage()), (route) => false);
-    
-    //Diario con uso sp, deprecated
-    //SharedPreferences sp = await SharedPreferences.getInstance();
-    //sp.setString(sp.getString('lastEntryDate')!, _entryText!);
-    //sp.setString(sp.getString('lastEntryDate')!+'M', _entryMood!);
+
     }
   }
 } //HomePage

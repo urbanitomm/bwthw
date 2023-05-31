@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 
 class Profile extends StatelessWidget {
   static const route = '/profile/';
   static const routeDisplayName = 'ProfilePage';
 
-  Profile({Key? key}) : super(key: key);
+  const Profile({Key? key}) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       appBar: MyAppbar(),
       drawer: MyDrawer(),
       body:
@@ -25,14 +22,14 @@ class Profile extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.face,
                   size: 30,
                   ),
                 SizedBox(
                   height:30,
                 ),
-                const Text(
+                Text(
                   'Profilo',
                   style: TextStyle(
                   color: Colors.black,
