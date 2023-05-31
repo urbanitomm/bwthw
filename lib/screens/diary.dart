@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
-import 'package:progetto_wearable/repository/databaseRepository.dart';
+import 'package:progetto_wearable/repository/databaserepository.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/database/entities/diaryentry.dart';
 import 'package:progetto_wearable/utils/funcs.dart';
@@ -21,13 +21,13 @@ class _DiaryState extends State<Diary>  {
   //Variables that control the mood 
   //Booleans are easier to work with into the diary but we use a string to
   //store more efficiently the mood into the database
-  bool _happyPressed = false;
-  bool _neutralPressed = false;
-  bool _sadPressed = false;
+  bool happyPressed = false;
+  bool neutralPressed = false;
+  bool sadPressed = false;
 
   //Initialized as null
-  String? _entryMood;
-  String? _entryText;
+  String? entryMood;
+  String? entryText;
 
   //Shown if the user does not fill the entry
   final snackBarText = const SnackBar(
@@ -63,14 +63,14 @@ class _DiaryState extends State<Diary>  {
                   iconSize: 60,
                   icon: Icon(
                     Icons.sentiment_very_satisfied,
-                    color: _happyPressed ? Colors.green : Colors.black,
+                    color: happyPressed ? Colors.green : Colors.black,
                     ),
                   onPressed: () {
                     setState((){
-                          _happyPressed = true;
-                          _neutralPressed = false;
-                          _sadPressed = false;
-                          _entryMood = 'Happy';
+                          happyPressed = true;
+                          neutralPressed = false;
+                          sadPressed = false;
+                          entryMood = 'Happy';
                         });
                   },
                   ),
@@ -78,14 +78,14 @@ class _DiaryState extends State<Diary>  {
                   iconSize: 60,
                   icon: Icon(
                     Icons.sentiment_neutral,
-                    color: _neutralPressed ? Colors.orange : Colors.black,
+                    color: neutralPressed ? Colors.orange : Colors.black,
                     ),
                   onPressed: () {
                     setState((){
-                          _happyPressed = false;
-                          _neutralPressed = true;
-                          _sadPressed = false;
-                          _entryMood = 'Neutral';
+                          happyPressed = false;
+                          neutralPressed = true;
+                          sadPressed = false;
+                          entryMood = 'Neutral';
                         });
                   },
                   ),                  
@@ -93,14 +93,14 @@ class _DiaryState extends State<Diary>  {
                   iconSize: 60,
                   icon: Icon(
                     Icons.sentiment_very_dissatisfied,
-                    color: _sadPressed ? Colors.red : Colors.black,
+                    color: sadPressed ? Colors.red : Colors.black,
                     ),
                   onPressed: () {
                     setState((){
-                          _happyPressed = false;
-                          _neutralPressed = false;
-                          _sadPressed = true;
-                          _entryMood = 'Sad';
+                          happyPressed = false;
+                          neutralPressed = false;
+                          sadPressed = true;
+                          entryMood = 'Sad';
                         });
                   },
                   ),
@@ -115,7 +115,7 @@ class _DiaryState extends State<Diary>  {
                   controller: textController,
                   maxLines: 4,
                   onChanged: (text) {  
-                    _entryText = text;  
+                    entryText = text;  
                   },
                   style: const TextStyle(
                     fontSize: 16.0,
@@ -162,7 +162,7 @@ class _DiaryState extends State<Diary>  {
             ),
             ElevatedButton(
                 onPressed: (){
-                  _entryCheck(context);
+                  entryCheck(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -181,17 +181,17 @@ class _DiaryState extends State<Diary>  {
   } //build
 
   
-  void _entryCheck(BuildContext context) async{
+  void entryCheck(BuildContext context) async{
   
-     if(_entryMood == null) { //Snackbar for missing mood
+     if(entryMood == null) { //Snackbar for missing mood
       ScaffoldMessenger.of(context).showSnackBar(snackBarMood);
 
-     }else if(_entryText == '' || _entryText == null){ //Snackbar for missing text
+     }else if(entryText == '' || entryText == null){ //Snackbar for missing text
       ScaffoldMessenger.of(context).showSnackBar(snackBarText);
     
     }else{ //If everything is ok i record the entry into the database
     await Provider.of<DatabaseRepository>(context, listen: false)
-                .insertDiaryentry(Diaryentry(getTodayDate(),_entryText!, _entryMood!));
+                .insertDiaryentry(Diaryentry(getTodayDate(),entryText!, entryMood!));
     
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Homepage()), (route) => false);
 

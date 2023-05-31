@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:progetto_wearable/database/entities/diaryentry.dart';
+import 'package:progetto_wearable/database/entities/report.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'package:progetto_wearable/repository/databaseRepository.dart';
+import 'package:progetto_wearable/repository/databaserepository.dart';
 
 
 //
@@ -204,6 +205,26 @@ class CalendarDiary extends State<CustomAgenda>  {
         endTime: DateTime.parse(consideredEntry.date).add(const Duration(hours: 5, days: -1)),
         subject: consideredEntry.entry,
         color: getColor(consideredEntry.mood),
+        isAllDay: true));
+    }
+
+    int? dbRepsLen = await Provider.of<DatabaseRepository>(context, listen: false).howManyReports();
+    if (dbRepsLen == null){
+      print('NON DOVREBBE ESSERE POSSIBILE AVERE NULL ENTRY NEL DB dei reports');
+      dbLen = 0;
+    }
+    List<Report> dbreps = await Provider.of<DatabaseRepository>(context, listen: false).findAllReports();
+
+    for(var i=0; i<dbRepsLen!; i++){
+      //Every report is extracted on its own
+      Report consideredEntry = dbreps[i];
+
+      appointments.add(Appointment(
+        startTime: DateTime.parse(consideredEntry.date),
+        //Endtime is not really required since the flag all day is active bu its important to set it nonetheless
+        endTime: DateTime.parse(consideredEntry.date).add(const Duration(hours: 5, days: -1)),
+        subject: consideredEntry.content,
+        color: Colors.blue,
         isAllDay: true));
     }
 

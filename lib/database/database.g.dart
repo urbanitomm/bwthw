@@ -63,6 +63,8 @@ class _$AppDatabase extends AppDatabase {
 
   DiaryentryDao? _diaryentryDaoInstance;
 
+  ReportDao? _reportDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -86,6 +88,8 @@ class _$AppDatabase extends AppDatabase {
       onCreate: (database, version) async {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Diaryentry` (`date` TEXT NOT NULL, `entry` TEXT NOT NULL, `mood` TEXT NOT NULL, PRIMARY KEY (`date`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Report` (`date` TEXT NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY (`date`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -96,6 +100,11 @@ class _$AppDatabase extends AppDatabase {
   @override
   DiaryentryDao get diaryentryDao {
     return _diaryentryDaoInstance ??= _$DiaryentryDao(database, changeListener);
+  }
+
+  @override
+  ReportDao get reportDao {
+    return _reportDaoInstance ??= _$ReportDao(database, changeListener);
   }
 }
 
@@ -162,5 +171,56 @@ class _$DiaryentryDao extends DiaryentryDao {
   @override
   Future<void> deleteDiaryentry(Diaryentry diaryentry) async {
     await _diaryentryDeletionAdapter.delete(diaryentry);
+  }
+}
+
+class _$ReportDao extends ReportDao {
+  _$ReportDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _reportInsertionAdapter = InsertionAdapter(
+            database,
+            'Report',
+            (Report item) =>
+                <String, Object?>{'date': item.date, 'content': item.content}),
+        _reportDeletionAdapter = DeletionAdapter(
+            database,
+            'Report',
+            ['date'],
+            (Report item) =>
+                <String, Object?>{'date': item.date, 'content': item.content});
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Report> _reportInsertionAdapter;
+
+  final DeletionAdapter<Report> _reportDeletionAdapter;
+
+  @override
+  Future<List<Report>> findAllReports() async {
+    return _queryAdapter.queryList('SELECT * FROM Report',
+        mapper: (Map<String, Object?> row) =>
+            Report(row['date'] as String, row['content'] as String));
+  }
+
+  @override
+  Future<int?> howManyReports() async {
+    return _queryAdapter.query('SELECT COUNT(*) FROM Diaryentry',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Future<void> insertReport(Report report) async {
+    await _reportInsertionAdapter.insert(report, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteReport(Report report) async {
+    await _reportDeletionAdapter.delete(report);
   }
 }

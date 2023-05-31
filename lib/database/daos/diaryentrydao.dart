@@ -15,15 +15,15 @@ abstract class DiaryentryDao {
   @Query('SELECT entry,mood FROM Diaryentry WHERE date = :date')
   Future<List<String?>> findEntriesWhere(String date);
 
-  //Query #2: COUNT-> this allows to obtain the number of entries
+  //Query #3: COUNT-> this allows to obtain the number of entries
   @Query('SELECT COUNT(*) FROM Diaryentry')
   Future<int?> howManyEntries();
 
-  //Query #2: INSERT -> this allows to add a Diaryentry in the table
+  //Query #4: INSERT -> this allows to add a Diaryentry in the table
   @insert
   Future<void> insertDiaryentry(Diaryentry diaryentry);
 
-  //Query #3: DELETE -> this allows to delete a Diaryentry from the table
+  //Query #5: DELETE -> this allows to delete a Diaryentry from the table
   @delete
   Future<void> deleteDiaryentry(Diaryentry diaryentry);
 

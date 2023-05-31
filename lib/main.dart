@@ -1,5 +1,5 @@
 import 'package:progetto_wearable/database/database.dart';
-import 'package:progetto_wearable/repository/databaseRepository.dart';
+import 'package:progetto_wearable/repository/databaseentryRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/screens/login.dart';

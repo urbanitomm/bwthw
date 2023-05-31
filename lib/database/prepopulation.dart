@@ -2,7 +2,7 @@ import 'package:progetto_wearable/database/entities/diaryentry.dart';
 import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:progetto_wearable/repository/databaseRepository.dart';
+import 'package:progetto_wearable/repository/databaserepository.dart';
 
 final DateTime firstDate = DateTime.now();
 final String formattedDate = dateToString(firstDate);
