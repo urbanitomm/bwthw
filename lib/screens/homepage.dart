@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/calendar.dart';
 import 'package:progetto_wearable/screens/data.dart';
 import 'package:progetto_wearable/screens/home.dart';
-import 'package:progetto_wearable/screens/login.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -16,6 +14,9 @@ class Homepage extends StatefulWidget {
   @override
   State<Homepage> createState() => _HomeState();
 }
+
+//THe homepage controls the bottom navigation bar and handle navigation
+//for the main screens
 
 class _HomeState extends State<Homepage> {
   int _selIdx = 0;
@@ -42,13 +43,15 @@ class _HomeState extends State<Homepage> {
     });
   }
 
+//Tapping on the bottom navigation page the user can navigate
+//between the pages
   Widget _selectPage({
     required int index,
   }) {
     switch (index) {
       case 0:
       print('1');
-        return Home();
+        return const Home();
       case 1:
       print('2');
         return Data();
@@ -57,7 +60,7 @@ class _HomeState extends State<Homepage> {
         return Calendar(); 
         
       default:
-        return Home();
+        return const Home();
     }
   }
 
@@ -66,8 +69,8 @@ class _HomeState extends State<Homepage> {
     print('HomePage built');
 
     return Scaffold(
-      drawer: MyDrawer(),
-      appBar: MyAppbar(),
+      drawer: const MyDrawer(),
+      appBar: const MyAppbar(),
       bottomNavigationBar: BottomNavigationBar(
             items: navBarItems,
             currentIndex: _selIdx,

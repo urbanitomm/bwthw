@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 
 class Data extends StatelessWidget {
@@ -15,10 +12,10 @@ class Data extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      //Non è necessario importare appbar e drawer perchè sono gia in homeapge
+    return const Scaffold(
+      //Appbar and the drawer are already in the homepage
             body:
-              const Text(
+              Text(
                 'Grafico',
                 style: TextStyle(
                     color: Colors.black,

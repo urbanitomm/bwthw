@@ -3,7 +3,7 @@ import 'package:progetto_wearable/screens/contacts.dart';
 import 'package:progetto_wearable/screens/selfReport.dart';
 
 class Home extends StatelessWidget {
-  Home({Key? key}) : super(key: key);
+  const Home({Key? key}) : super(key: key);
 
   static const route = '/homepage/';
   static const routename = 'HomePage';
@@ -17,12 +17,12 @@ class Home extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "You already submitted today's entry",
               style: TextStyle(  
               fontSize: 18)),
 
-            SizedBox(
+            const SizedBox(
               height: 100,
             ),
             ElevatedButton(
@@ -34,11 +34,11 @@ class Home extends StatelessWidget {
                   fixedSize: const Size(200, 70),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
-                child: Text(
+                child: const Text(
                   'Self report',
                   style: TextStyle(  
                     fontSize: 25))),
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
             ElevatedButton(
@@ -50,7 +50,7 @@ class Home extends StatelessWidget {
                   fixedSize: const Size(200, 70),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
-                child: Text(
+                child: const Text(
                   'Ask for help',
                   style: TextStyle(  
                     fontSize: 25)),  
