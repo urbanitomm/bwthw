@@ -32,7 +32,7 @@ class MyDrawer extends StatelessWidget {
               leading: const Icon(Icons.account_box),
               title: const Text("Profile"),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()));
               },
             ),
             ListTile(
@@ -63,7 +63,7 @@ class MyDrawer extends StatelessWidget {
     sp.remove('username');
 
     //Then pop the HomePage
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Login()), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const Login()), (route) => false);
   }//_toCalendarPage
 }
 

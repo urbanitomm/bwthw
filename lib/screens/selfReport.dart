@@ -83,7 +83,7 @@ class SelfReport extends StatelessWidget {
             const SizedBox(
               height: 30,
             ),
-            Container(
+            SizedBox(
               width: 300.0,
               child:
                 TextField(
@@ -131,7 +131,7 @@ class SelfReport extends StatelessWidget {
             const SizedBox(
               height: 30,
             ),
-            Container(
+            SizedBox(
               width: 300.0,
               child:
                 TextField(
@@ -181,7 +181,7 @@ class SelfReport extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Homepage()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

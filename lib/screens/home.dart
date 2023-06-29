@@ -27,7 +27,7 @@ class Home extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => SelfReport()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SelfReport()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,
@@ -43,7 +43,7 @@ class Home extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Contacts()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Contacts()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,

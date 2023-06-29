@@ -108,7 +108,7 @@ class _DiaryState extends State<Diary>  {
             const SizedBox(
               height: 100,
             ),
-            Container(
+            SizedBox(
               width: 300.0,
               child:
                 TextField(
@@ -193,7 +193,7 @@ class _DiaryState extends State<Diary>  {
     await Provider.of<DatabaseRepository>(context, listen: false)
                 .insertDiaryentry(Diaryentry(getTodayDate(),_entryText!, _entryMood!));
     
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Homepage()), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const Homepage()), (route) => false);
 
     }
   }

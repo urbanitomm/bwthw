@@ -20,7 +20,7 @@ class Homepage extends StatefulWidget {
 
 class _HomeState extends State<Homepage> {
   int _selIdx = 0;
-  
+
   List<BottomNavigationBarItem> navBarItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.home),
@@ -34,7 +34,6 @@ class _HomeState extends State<Homepage> {
       icon: Icon(Icons.calendar_month),
       label: 'Diary',
     ),
-
   ];
 
   void _onItemTapped(int index) {
@@ -50,15 +49,15 @@ class _HomeState extends State<Homepage> {
   }) {
     switch (index) {
       case 0:
-      print('1');
+        print('1');
         return const Home();
       case 1:
-      print('2');
+        print('2');
         return Data();
       case 2:
-      print('3');
-        return Calendar(); 
-        
+        print('3');
+        return const Calendar();
+
       default:
         return const Home();
     }
@@ -72,9 +71,10 @@ class _HomeState extends State<Homepage> {
       drawer: const MyDrawer(),
       appBar: const MyAppbar(),
       bottomNavigationBar: BottomNavigationBar(
-            items: navBarItems,
-            currentIndex: _selIdx,
-            onTap: _onItemTapped,),
+        items: navBarItems,
+        currentIndex: _selIdx,
+        onTap: _onItemTapped,
+      ),
       body: _selectPage(index: _selIdx),
     );
   } //build
