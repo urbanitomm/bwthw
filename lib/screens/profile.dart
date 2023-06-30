@@ -1,22 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
 
-
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
+  const Profile({Key? key}) : super(key: key);
   static const route = '/profile/';
   static const routeDisplayName = 'ProfilePage';
 
-  const Profile({Key? key}) : super(key: key);
+  @override
+  _ProfileState createState() => _ProfileState();
+}
 
+class _ProfileState extends State<Profile> {
+  bool isDarkModeEnabled = false; //default value
+
+  @override
+  void initState() {
+    super.initState();
+    loadPref();
+  }
+
+  Future<void> loadPref() async {
+    final sp = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkModeEnabled = sp.getBool('isDarkModeEnabled') ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: MyAppbar(),
-      drawer: MyDrawer(),
-      body:
-        Row(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: isDarkModeEnabled
+          ? ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: const ColorScheme.dark(
+                primary: Colors.black,
+                background: Colors.black,
+                onBackground: Colors.black,
+                secondary: Colors.blue,
+              ),
+            )
+          : ThemeData(
+              brightness: Brightness.light,
+              colorScheme: const ColorScheme.light(
+                primary: Color.fromARGB(190, 71, 70, 70),
+                background: Color.fromARGB(255, 0, 0, 0),
+                onBackground: Colors.white,
+                secondary: Colors.blue,
+              ),
+            ),
+      home: Scaffold(
+        appBar: MyAppbar(),
+        drawer: MyDrawer(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Homepage()));
+          },
+          child: Icon(Icons.arrow_back),
+        ),
+        body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
@@ -25,20 +71,15 @@ class Profile extends StatelessWidget {
                 Icon(
                   Icons.face,
                   size: 30,
-                  ),
+                ),
                 SizedBox(
-                  height:30,
+                  height: 30,
                 ),
-                Text(
-                  'Profilo',
-                  style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold),
-                ),
-              ],),
+              ],
+            ),
           ],
-        )
-      ); 
+        ),
+      ),
+    );
   }
 }
