@@ -41,10 +41,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text("Options"),
-            onTap: () async {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Options()));
-            },
+            onTap: () {},
           ),
           ListTile(
               leading: const Icon(Icons.logout),

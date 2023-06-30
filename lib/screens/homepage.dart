@@ -65,8 +65,10 @@ class _HomeState extends State<Homepage> {
     switch (index) {
       case 0:
         print('1');
+        print('1');
         return const Home();
       case 1:
+        print('2');
         print('2');
         return Data();
       case 2:

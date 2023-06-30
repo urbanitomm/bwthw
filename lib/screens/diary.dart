@@ -148,7 +148,7 @@ class _DiaryState extends State<Diary> {
                 const SizedBox(
                   height: 100,
                 ),
-                Container(
+                SizedBox(
                     width: 300.0,
                     child: TextField(
                       controller: textController,

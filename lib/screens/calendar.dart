@@ -111,7 +111,7 @@ class CalendarDiary extends State<CustomAgenda>  {
                                             ),
                                               title: Container(
                                                   child: Text(
-                                                      '${_appointmentDetails[index].subject}',
+                                                      _appointmentDetails[index].subject,
                                                       textAlign: TextAlign.center,
                                                       style: const TextStyle(
                                                           fontWeight: FontWeight.w600,
