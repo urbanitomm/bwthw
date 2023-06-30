@@ -16,6 +16,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginPage extends State<Login> {
+  bool? isTermsAccepted = false;
   @override
   void initState() {
     super.initState();
@@ -36,19 +37,23 @@ class _LoginPage extends State<Login> {
   } //_checkLogin
 
   Future<String> _loginUser(LoginData data) async {
-    if (data.name == '1234@5678.com' && data.password == '123456') {
+    if (data.name == '1234@5678.com' &&
+        data.password == '123456' &&
+        isTermsAccepted == true) {
       final sp = await SharedPreferences.getInstance();
       sp.setString('username', data.name);
 
       return '';
-    } else {
+    } else if (data.name != '1234@5678.com' || data.password != '123456') {
       return 'Wrong credentials';
+    } else {
+      return 'you must accept the terms of service';
     }
   }
 
-  // _loginUser
-  Future<String> _signUpUser(SignupData data) async {
-    return 'To be implemented';
+  Future<void> _saveTermPreference(bool value) async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setBool('isConditionAccepted', value);
   }
 
   // _signUpUser
@@ -60,14 +65,51 @@ class _LoginPage extends State<Login> {
   @override
   Widget build(BuildContext context) {
     print('Build login');
-    return FlutterLogin(
-      title: 'App_name',
-      onLogin: _loginUser,
-      onSignup: _signUpUser,
-      onRecoverPassword: _recoverPassword,
-      onSubmitAnimationCompleted: () async {
-        _toDiaryPage(context);
-      },
+
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: FlutterLogin(
+              title: 'App_name',
+              onLogin: _loginUser,
+              onRecoverPassword: _recoverPassword,
+              onSubmitAnimationCompleted: () async {
+                _toDiaryPage(context);
+              },
+              theme: LoginTheme(
+                primaryColor: Color.fromARGB(255, 129, 7, 143),
+                accentColor: Colors.yellow,
+                errorColor: Colors.deepOrange,
+                cardTheme: CardTheme(
+                  color: Color.fromARGB(255, 25, 49, 229),
+                  elevation: 5,
+                  margin: EdgeInsets.only(top: 15),
+                  shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Text(
+            'To login you must accept our terms of service',
+            style: TextStyle(
+              color: Colors.blue,
+              fontSize: 10,
+            ),
+          ),
+          Checkbox(
+            value: isTermsAccepted,
+            onChanged: (bool? value) {
+              setState(() {
+                isTermsAccepted = value!;
+              });
+              _saveTermPreference(isTermsAccepted!);
+            },
+          ),
+        ],
+      ),
     );
   } // build
 
