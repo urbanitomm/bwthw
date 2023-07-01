@@ -6,21 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/repository/databaseRepository.dart';
-
+import 'package:progetto_wearable/repository/providerDataBaseSR.dart';
+import 'package:progetto_wearable/database/entities/report.dart';
 
 //
 //      TO DO:
-//    Appena possibile sostituire le variabili sostiche happypressed, neutralpressed, sadpressed con 
+//    Appena possibile sostituire le variabili sostiche happypressed, neutralpressed, sadpressed con
 //    delle variabili provenienti dalle shared preferences di modo da poter lavorare con dati aggiornati
 //
 //
 //
 
-
 class Calendar extends StatelessWidget {
   const Calendar({Key? key}) : super(key: key);
-  
-    @override
+
+  @override
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -36,8 +36,7 @@ class CustomAgenda extends StatefulWidget {
   State<StatefulWidget> createState() => CalendarDiary();
 }
 
-
-class CalendarDiary extends State<CustomAgenda>  {
+class CalendarDiary extends State<CustomAgenda> {
   final List<Appointment> _appointmentDetails = <Appointment>[];
 
   //DataSource is the proprietary data format for the SfCalendar widget
@@ -50,109 +49,108 @@ class CalendarDiary extends State<CustomAgenda>  {
     dataSourceFuture = getCalendarDataSource();
     super.initState();
     //Convert from future to regular DataSource
-    deFuture(dataSourceFuture).then((dataSourceFuture){
+    deFuture(dataSourceFuture).then((dataSourceFuture) {
       dataSource = dataSourceFuture;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return (Scaffold(
-      body: SafeArea(
-        child:
-          Consumer<DatabaseRepository>(
-            builder: (context, dbr, child) {
-            //Fetching the data from the database
-            return FutureBuilder(
-              initialData: null,
-              future: dbr.findAllEntries(),
-              builder: (context, snapshot) {
-                //Converting it into the Datasource format
-                return FutureBuilder(
+    return (Scaffold(body: SafeArea(child: Consumer<DatabaseRepository>(
+      builder: (context, dbr, child) {
+        //Fetching the data from the database
+        return FutureBuilder(
+            initialData: null,
+            future: dbr.findAllEntries(),
+            builder: (context, snapshot) {
+              //Converting it into the Datasource format
+              return FutureBuilder(
                   initialData: null,
                   future: getCalendarDataSource(),
                   builder: (context, dataSourcesnapshot) {
-                   if (dataSourcesnapshot.hasData) {
-                     return Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: SfCalendar(
-                            view: CalendarView.month,
-                            dataSource: dataSource,
-                            initialSelectedDate: DateTime.now(), //The first selected day is today
-                            onSelectionChanged: selectionChanged,
+                    if (dataSourcesnapshot.hasData) {
+                      return Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: SfCalendar(
+                              view: CalendarView.month,
+                              dataSource: dataSource,
+                              initialSelectedDate: DateTime
+                                  .now(), //The first selected day is today
+                              onSelectionChanged: selectionChanged,
                             ),
                           ),
-                        Expanded(
-                            child: Container(
-                                color: Colors.black12,
-                                child: ListView.separated(
-                                  padding: const EdgeInsets.all(2),
-                                  itemCount: _appointmentDetails.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return SingleChildScrollView(
-                                      child: Container(
-                                        constraints: const BoxConstraints(
-                                          maxWidth: 250,
-                                          ),
-                                        padding: const EdgeInsets.all(2),
-                                        color: _appointmentDetails[index].color,
-                                        child: ListTile(
-                                          leading: Column(
-                                            children: <Widget>[
-                                              Container(
-                                              child: 
-                                              Icon(
-                                                getIcon(_appointmentDetails[index].color),
-                                                size: 30,
-                                                color: Colors.white,
-                                              )),
-                                              ],
-                                            ),
-                                              title: Container(
-                                                  child: Text(
-                                                      _appointmentDetails[index].subject,
-                                                      textAlign: TextAlign.center,
-                                                      style: const TextStyle(
-                                                          fontWeight: FontWeight.w600,
-                                                          color: Colors.white)
-                                                        )
-                                                      ),
-                                        )
-                                      )
-                                    );
-                                  },
-                              separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(
-                                height: 5,
-                              ),
-                            )
-                          )
-                        ),
-                      ],
-                    );
+                          Expanded(
+                              child: Container(
+                                  color: Colors.black12,
+                                  child: ListView.separated(
+                                    padding: const EdgeInsets.all(2),
+                                    itemCount: _appointmentDetails.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return SingleChildScrollView(
+                                          child: Container(
+                                              constraints: const BoxConstraints(
+                                                maxWidth: 250,
+                                              ),
+                                              padding: const EdgeInsets.all(2),
+                                              color: _appointmentDetails[index]
+                                                  .color,
+                                              child: ListTile(
+                                                leading: Column(
+                                                  children: <Widget>[
+                                                    Container(
+                                                        child: Icon(
+                                                      getIcon(
+                                                          _appointmentDetails[
+                                                                  index]
+                                                              .color),
+                                                      size: 30,
+                                                      color: Colors.white,
+                                                    )),
+                                                  ],
+                                                ),
+                                                title: Container(
+                                                    child: Text(
+                                                        _appointmentDetails[
+                                                                index]
+                                                            .subject,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color:
+                                                                Colors.white))),
+                                              )));
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int index) =>
+                                            const Divider(
+                                      height: 5,
+                                    ),
+                                  ))),
+                        ],
+                      );
                     } else {
                       //A CircularProgressIndicator is shown while is loading.
-                      return const Center(child: CircularProgressIndicator()
-                      )                      ;
+                      return const Center(child: CircularProgressIndicator());
                     }
-                   } //else
-                );
-              }//builder of second FutureBuilder
+                  } //else
+                  );
+            } //builder of second FutureBuilder
             );
-          },//builder of first FutureBuilder
-        )
-      )
-    )
-    );
+      }, //builder of first FutureBuilder
+    ))));
   }
+
   //Highlight the selected date
   void selectionChanged(CalendarSelectionDetails calendarSelectionDetails) {
     getSelectedDateAppointments(calendarSelectionDetails.date);
   }
 
   //Workaround for the conversion from Future<DataSource> to DataSource
-  Future<DataSource> deFuture(Future<DataSource> dataSourceFuture){
+  Future<DataSource> deFuture(Future<DataSource> dataSourceFuture) {
     return dataSourceFuture;
   }
 
@@ -169,11 +167,15 @@ class CalendarDiary extends State<CustomAgenda>  {
 
       for (int i = 0; i < dataSource.appointments!.length; i++) {
         Appointment appointment = dataSource.appointments![i] as Appointment;
+
         /// It return the occurrence appointment for the given pattern appointment at the selected date.
-        final Appointment? occurrenceAppointment = dataSource.getOccurrenceAppointment(appointment, selectedDate!, '');
+        final Appointment? occurrenceAppointment =
+            dataSource.getOccurrenceAppointment(appointment, selectedDate!, '');
         if ((DateTime(appointment.startTime.year, appointment.startTime.month,
-            appointment.startTime.day) == DateTime(selectedDate.year,selectedDate.month,
-            selectedDate.day)) || occurrenceAppointment != null) {
+                    appointment.startTime.day) ==
+                DateTime(
+                    selectedDate.year, selectedDate.month, selectedDate.day)) ||
+            occurrenceAppointment != null) {
           setState(() {
             _appointmentDetails.add(appointment);
           });
@@ -182,37 +184,53 @@ class CalendarDiary extends State<CustomAgenda>  {
     });
   }
 
-
-  Future<DataSource> getCalendarDataSource() async{
-    //Inizialization of the data entry list (this widget calls it appointments)
+  Future<DataSource> getCalendarDataSource() async {
     final List<Appointment> appointments = <Appointment>[];
-    //Gets the number of entries of the db and then creates a list of appointments that contains every entry
-    int? dbLen = await Provider.of<DatabaseRepository>(context, listen: false).howManyEntries();
-    if (dbLen == null){
+
+    int? dbLen = await Provider.of<DatabaseRepository>(context, listen: false)
+        .howManyEntries();
+    if (dbLen == null) {
       print('NON DOVREBBE ESSERE POSSIBILE AVERE NULL ENTRY NEL DB');
       dbLen = 0;
     }
-    List<Diaryentry> db = await Provider.of<DatabaseRepository>(context, listen: false).findAllEntries();
 
-    for(var i=0; i<dbLen; i++){
-      //Every entry is extractes on its own
+    List<Diaryentry> db =
+        await Provider.of<DatabaseRepository>(context, listen: false)
+            .findAllEntries();
+    List<Report> reports =
+        await Provider.of<SelfReportProvider>(context, listen: false)
+            .findAllReports();
+
+    for (var i = 0; i < dbLen; i++) {
       Diaryentry consideredEntry = db[i];
 
       appointments.add(Appointment(
         startTime: DateTime.parse(consideredEntry.date),
-        //Endtime is not really required since the flag all day is active bu its important to set it nonetheless
-        endTime: DateTime.parse(consideredEntry.date).add(const Duration(hours: 5, days: -1)),
+        endTime: DateTime.parse(consideredEntry.date)
+            .add(const Duration(hours: 5, days: -1)),
         subject: consideredEntry.entry,
         color: getColor(consideredEntry.mood),
-        isAllDay: true));
+        isAllDay: true,
+      ));
+    }
+
+    for (var report in reports) {
+      appointments.add(Appointment(
+        startTime: DateTime.parse(report.date),
+        endTime:
+            DateTime.parse(report.date).add(const Duration(hours: 5, days: -1)),
+        subject: report.content,
+        color: Color.fromARGB(255, 76, 147, 175),
+        isAllDay: true,
+      ));
     }
 
     return DataSource(appointments);
-  } 
-  
+  }
+
   //Color comparison
   bool compare(Color color1, Color color2) {
-   return color1.value == color2.value;    
+    return color1.value == color2.value;
   }
 
   //Function that gets the icons from the mood of the entry
@@ -227,7 +245,7 @@ class CalendarDiary extends State<CustomAgenda>  {
       print('Qualcosa è andato storto nella selezione del mood');
       return Icons.question_mark;
     }
-  } 
+  }
 
   //Function that gets the color from the mood of the entry
   getColor(mood) {
@@ -242,7 +260,6 @@ class CalendarDiary extends State<CustomAgenda>  {
       return Colors.black;
     }
   }
-
 }
 
 class DataSource extends CalendarDataSource {
@@ -251,15 +268,12 @@ class DataSource extends CalendarDataSource {
   }
 }
 
-
-
-
 //BLOCCHI DI CODICE POTENZIALMENTE UTILI
 
-    //String entry;
-    //Future <String> futureEntry = getEntry();
-  
-    /*getEntry().then((entries) {
+//String entry;
+//Future <String> futureEntry = getEntry();
+
+/*getEntry().then((entries) {
     appointments.add(Appointment(
       startTime: DateTime.now(),
       endTime: DateTime.now().add(const Duration(hours: 1)),
@@ -267,7 +281,6 @@ class DataSource extends CalendarDataSource {
       color: Colors.orange,
     ));
   });*/
-
 
 /*
 class EntryDataSource extends CalendarDataSource {
@@ -349,8 +362,7 @@ List<DiaryEntry> _getDataSource() {
   }
   */
 
-
-    /*
+/*
   //Passo alla funzione che crea la lista di 'appuntamenti' la coppia test+colore di modo da
   //poter creare la entry in maniera corretta
   Future<String> getEntry()async{
@@ -364,10 +376,7 @@ List<DiaryEntry> _getDataSource() {
   return retrievedText;
   } */
 
-
-
-
-    /*
+/*
     appointments.add(Appointment(
         startTime: DateTime.now().add(const Duration(hours: 4, days: -1)),
         endTime: DateTime.now().add(const Duration(hours: 5, days: -1)),
@@ -378,14 +387,13 @@ List<DiaryEntry> _getDataSource() {
         isAllDay: true));
         */
 
-    //String entry;
-    //Future <String> futureEntry = getEntry();
+//String entry;
+//Future <String> futureEntry = getEntry();
 
+//The logic is to query the DB for the entire list of Todo using dbr.findAllTodos()
+//and then populate the ListView accordingly.
+//We need to use a FutureBuilder since the result of dbr.findAllTodos() is a Future.
 
-    //The logic is to query the DB for the entire list of Todo using dbr.findAllTodos()
-          //and then populate the ListView accordingly.
-          //We need to use a FutureBuilder since the result of dbr.findAllTodos() is a Future.  
-
-          //PROBLEMA: il futurebuilder viene chiamato prima della conclusione della inizializzazione di datasource
-          //dato che datasource richiede dei dati ottenuti in maniera asincrona ma l'attribuzione stessa non è asincrona
-          //questo fa chiamare il futurebuilder un istante prima del momento opportuno impedendo il caricamento corretto della pagina
+//PROBLEMA: il futurebuilder viene chiamato prima della conclusione della inizializzazione di datasource
+//dato che datasource richiede dei dati ottenuti in maniera asincrona ma l'attribuzione stessa non è asincrona
+//questo fa chiamare il futurebuilder un istante prima del momento opportuno impedendo il caricamento corretto della pagina
