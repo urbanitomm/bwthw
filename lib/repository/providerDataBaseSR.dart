@@ -1,5 +1,4 @@
 import 'package:progetto_wearable/database/database.dart';
-import 'package:progetto_wearable/database/entities/diaryentry.dart';
 import 'package:progetto_wearable/database/entities/report.dart';
 import 'package:flutter/material.dart';
 
