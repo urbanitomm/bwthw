@@ -8,7 +8,7 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        title: const Text('App name'),
+        title: const Text('AlcoCare'),
         //leading: Icon(Icons.menu),
         //leadingWidth: 100,
       );

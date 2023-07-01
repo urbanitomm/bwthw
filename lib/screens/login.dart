@@ -71,7 +71,7 @@ class _LoginPage extends State<Login> {
         children: [
           Expanded(
             child: FlutterLogin(
-              title: 'App_name',
+              title: 'AlcoCare',
               onLogin: _loginUser,
               onRecoverPassword: _recoverPassword,
               onSubmitAnimationCompleted: () async {
@@ -82,7 +82,7 @@ class _LoginPage extends State<Login> {
                 accentColor: Colors.yellow,
                 errorColor: Colors.deepOrange,
                 cardTheme: CardTheme(
-                  color: Color.fromARGB(255, 25, 49, 229),
+                  color: Color.fromARGB(255, 88, 170, 236),
                   elevation: 5,
                   margin: EdgeInsets.only(top: 15),
                   shape: ContinuousRectangleBorder(
@@ -92,21 +92,27 @@ class _LoginPage extends State<Login> {
               ),
             ),
           ),
-          const Text(
-            'To login you must accept our terms of service',
-            style: TextStyle(
-              color: Colors.blue,
-              fontSize: 10,
-            ),
-          ),
-          Checkbox(
-            value: isTermsAccepted,
-            onChanged: (bool? value) {
-              setState(() {
-                isTermsAccepted = value!;
-              });
-              _saveTermPreference(isTermsAccepted!);
-            },
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'To login you must accept our terms of service',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 10,
+                ),
+              ),
+              Checkbox(
+                value: isTermsAccepted,
+                onChanged: (bool? value) {
+                  setState(() {
+                    isTermsAccepted = value!;
+                  });
+                  _saveTermPreference(isTermsAccepted!);
+                },
+              ),
+            ],
           ),
         ],
       ),
