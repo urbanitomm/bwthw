@@ -67,7 +67,7 @@ class _DiaryState extends State<Diary> {
                   primary: Colors.black,
                   background: Colors.black,
                   onBackground: Colors.black,
-                  secondary: Colors.blue,
+                  secondary: Colors.yellow,
                 ),
               )
             : ThemeData(
@@ -76,7 +76,7 @@ class _DiaryState extends State<Diary> {
                   primary: Color.fromARGB(190, 71, 70, 70),
                   background: Color.fromARGB(255, 0, 0, 0),
                   onBackground: Colors.white,
-                  secondary: Colors.blue,
+                  secondary: Colors.yellow,
                 ),
               ),
         home: Scaffold(
@@ -203,11 +203,14 @@ class _DiaryState extends State<Diary> {
                     _entryCheck(context);
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.yellow,
                       fixedSize: const Size(200, 70),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
-                  child: const Text('Submit', style: TextStyle(fontSize: 25)),
+                  child: const Text('Submit',
+                      style: TextStyle(
+                          fontSize: 25,
+                          color: Color.fromARGB(255, 129, 7, 143))),
                 ),
               ],
             ),

@@ -140,7 +140,7 @@ class OptionState extends State<OptionS> {
                 primary: Colors.black,
                 background: Colors.black,
                 onBackground: Colors.black,
-                secondary: Colors.blue,
+                secondary: Colors.yellow,
               ),
             )
           : ThemeData(
@@ -149,7 +149,7 @@ class OptionState extends State<OptionS> {
                 primary: Color.fromARGB(190, 71, 70, 70),
                 background: Color.fromARGB(255, 0, 0, 0),
                 onBackground: Colors.white,
-                secondary: Colors.blue,
+                secondary: Colors.yellow,
               ),
             ),
     );
