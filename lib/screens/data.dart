@@ -42,21 +42,10 @@ class _DataState extends State<Data> {
   Future<void> _loadData() async {
     heartRates = await _dataSourceFuture;
     setState(() {});
-    print('provaaaaa');
-    //print the size of the list
-    print(heartRates.length);
-    //pritn the type of time
-    print('type');
-    print(heartRates[1000].time.runtimeType);
-    print('time string');
-    print(heartRates[1000].time);
-    print('time double');
-    print(timeStringToDouble(heartRates[1000].time));
   }
 
   @override
   void initState() {
-    print('inside init state');
     _dataSourceFuture = _requestDataHR(context);
     super.initState();
     _loadData();
@@ -189,11 +178,16 @@ Future<List<HeartRate>> _requestDataHR(BuildContext context) async {
   }
 
   //Create request
-  //DateTime date = DateTime.now().subtract(const Duration(days: 1));
-  //String hrEndpoint = getHrEndpoint(date);
+  DateTime date = DateTime.now().subtract(const Duration(days: 1));
+  String dateFormatted = dateToString(date);
 
   //final url = Impact.baseUrl + hrEndpoint;
-  final url = Impact.baseUrl + Impact.hrEndpoint;
+  print(Impact.hrEndpoint);
+  final url = Impact.baseUrl +
+      '/data/v1/heart_rate/patients/Jpefaq6m58/day/' +
+      dateFormatted +
+      '/'; //+ dateFormatted;
+  print('url: $url');
   final headers = {HttpHeaders.authorizationHeader: 'Bearer $accessToken'};
 
   //Send request
