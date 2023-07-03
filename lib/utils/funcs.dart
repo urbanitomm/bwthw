@@ -4,9 +4,19 @@ import 'package:url_launcher/url_launcher.dart';
 //String conversion format
 const String stringFormat = 'yyyy-MM-dd';
 
-String getTodayDate() {
-  //Format today's date
+String getYesterdayDate() {
+  //Get yesterday's date
   DateTime now = DateTime.now();
+  DateTime yesterday = now.subtract(Duration(days: 1));
+  //Format yesterday's date
+  String formattedDate = DateFormat(stringFormat).format(yesterday);
+  return formattedDate;
+}
+
+String getTodayDate() {
+  //Get yesterday's date
+  DateTime now = DateTime.now();
+  //Format yesterday's date
   String formattedDate = DateFormat(stringFormat).format(now);
   return formattedDate;
 }

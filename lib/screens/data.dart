@@ -1,17 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+//import 'dart:js' as js;
 
 import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:progetto_wearable/database/entities/HRentity.dart';
 import 'package:progetto_wearable/models/hr.dart';
-import 'package:progetto_wearable/models/restingHr.dart';
+//import 'package:progetto_wearable/models/restingHr.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:progetto_wearable/utils/impact.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+//import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:progetto_wearable/utils/funcs.dart';
+import 'package:progetto_wearable/repository/providerHR.dart';
 
 class Data extends StatefulWidget {
   static const route = '/data/';
@@ -24,9 +29,21 @@ class Data extends StatefulWidget {
 }
 
 class _DataState extends State<Data> {
-  //int aqi = 10;
+  final List<Color> gradientColors = [
+    const Color(0xff23b6e6),
+    const Color(0xff02d39a),
+  ];
+
+  //////////////////////////////////////////////////////////////////////// DA QUI
   final Future<List<HeartRate>> _dataSourceFuture = _requestDataHR();
+
   List<HeartRate> heartRates = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
   Future<void> _loadData() async {
     heartRates = await _dataSourceFuture;
@@ -36,53 +53,35 @@ class _DataState extends State<Data> {
     print(heartRates.length);
     //pritn the type of time
     print('type');
-    print(heartRates[4].time.runtimeType);
+    print(heartRates[1000].time.runtimeType);
     print('time string');
-    print(heartRates[4].time);
+    print(heartRates[1000].time);
     print('time double');
-    print(timeStringToDouble(heartRates[4].time));
-
-    //print('max value');
-    //print(heartRates.reduce((curr, next) => curr.value > next.value ? curr : next));
-    //heartRates.forEach((element) => print(element));
+    print(timeStringToDouble(heartRates[1000].time));
   }
 
-  //chack the max value of the list of heartRates and print it
-
-  //call the load data function
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  //print the values of heartRates one by one
-
-  //final  _dataSourceFuture = await _requestDataHR();
-
-  //_DataState(this._dataSourceFuture, {Key? key}) : super(key: key);
-  //print the values of _dataSourceFuture one by one
-  //_dataSourceFuture.forEach((element) => print(element));
-  /*
-  @override
-  void initState() {
-    _dataSourceFuture = _requestDataHR();
-  }
-  */
-  //print the
-
-  //DateTime day = DateTime.now();
+  ////////////////////////////////////////////////////////// FINO A QUI
+  /// inserire in riga 76 per il DB
 
   @override
   Widget build(BuildContext context) {
     return LineChart(LineChartData(
         minX: 0,
+        minY: 0,
+        maxY: 150,
         gridData: FlGridData(
           show: true,
           getDrawingHorizontalLine: (value) {
-            return FlLine(
+            return const FlLine(
               color: Colors.black,
-              strokeWidth: 1,
+              strokeWidth: 0.5,
+            );
+          },
+          drawVerticalLine: true,
+          getDrawingVerticalLine: (value) {
+            return const FlLine(
+              color: Colors.black,
+              strokeWidth: 0.5,
             );
           },
         ),
@@ -92,149 +91,18 @@ class _DataState extends State<Data> {
         ),
         lineBarsData: [
           LineChartBarData(
-            //LineChartBarData(spots: heartRates.map((e) => FlSpot(double.tryParse(e.time) ?? 0, e.value)).toList(),)
             spots: heartRates
                 .map((e) =>
                     FlSpot(timeStringToDouble(e.time), e.value.toDouble()))
                 .toList(),
             isCurved: true,
             color: Colors.blue,
+            barWidth: 2,
+            dotData: const FlDotData(show: false),
+            belowBarData:
+                BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
           )
-          //dotData: FlDotData(show: true))
         ]));
-    //create a an elevated button
-    /*return Scaffold(
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-              onPressed: () async {
-                await graph();
-              },
-              child: Text('Get HR')),
-        ],
-      )),
-    );*/
-    /*return Scaffold(
-      body: FutureBuilder<List<HeartRate>>(
-        future: _dataSourceFuture,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            print('is not null');
-
-            return SfCartesianChart(
-                title: ChartTitle(text: 'HR Chart'),
-                //legend: Legend(isVisible: true),
-                series: <ChartSeries>[
-                  LineSeries<HeartRate, String>(
-                    dataSource: snapshot.data!,
-                    xValueMapper: (HeartRate hr, _) => hr.time,
-                    yValueMapper: (HeartRate hr, _) => hr.value,
-                  )
-                ]);
-          } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
-          } else {
-            return const CircularProgressIndicator();
-          }
-        },
-      ),
-    );
-    */
-    /*return Scaffold(
-      //Appbar and the drawer are already in the homepage
-      body: SingleChildScrollView(
-        child: SizedBox(
-          width: 200.0,
-          height: 200.0,
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    /*ElevatedButton(
-                    onPressed: () async {
-                      final result = await _authorize();
-                      final message = result == 200
-                          ? 'You have been authorized'
-                          : 'You have been denied access';
-                      final data = await _requestDataHR();
-                      //print('ok');
-                      print(data);
-                      ScaffoldMessenger.of(context)
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text(message)));
-                    },
-                    child: Text('Get HR')),
-                              ElevatedButton(
-                    onPressed: () async {
-                      final result = await _authorize();
-                      final message = result == 200
-                          ? 'You have been authorized'
-                          : 'You have been denied access';
-                      final data = await _requestDataRestingHR();
-                      //print('ok');
-                      print(data);
-                      ScaffoldMessenger.of(context)
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text(message)));
-                    },
-                    child: Text('Get RESTING HR')), */
-                    Scaffold(
-                      body: FutureBuilder<List<HeartRate>>(
-                        future: _dataSourceFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data != null) {
-                            print('is not null');
-                            return SfCartesianChart(
-                                title: ChartTitle(text: 'HR Chart'),
-                                series: <ChartSeries>[
-                                  LineSeries<HeartRate, String>(
-                                    dataSource: snapshot.data!,
-                                    xValueMapper: (HeartRate hr, _) => hr.time,
-                                    yValueMapper: (HeartRate hr, _) => hr.value,
-                                  )
-                                ]);
-                          } else if (snapshot.hasError) {
-                            return Text('${snapshot.error}');
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
-                        },
-                      ),
-                    )
-                  ]),
-            ),
-          ),
-        ),
-      ),
-    );*/
-    // Try with another chart
-  }
-}
-
-Future<void> graph() async {
-  final dataSourceFuture = await _requestDataHR();
-  print('inside graph');
-
-  //print the size of the list
-  print(dataSourceFuture.length);
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-          body: SfCartesianChart(
-        series: <ChartSeries>[
-          LineSeries<HeartRate, String>(
-            dataSource: dataSourceFuture,
-            xValueMapper: (HeartRate hr, _) => hr.time,
-            yValueMapper: (HeartRate hr, _) => hr.value,
-          )
-        ],
-      )),
-    );
   }
 }
 
@@ -304,6 +172,7 @@ Future<int> _refreshToken() async {
 // This method allows to obtain the data from IMPACT
 
 Future<List<HeartRate>> _requestDataHR() async {
+  // PER DB:  Future<List<HeartRate>> _requestDataHR(BuildContext context) async {
   final result = await _authorize();
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
@@ -320,8 +189,6 @@ Future<List<HeartRate>> _requestDataHR() async {
   }
 
   //Create request
-
-  //create a variable that is a week before the current date
   final url = Impact.baseUrl + Impact.hrEndpoint;
   final headers = {HttpHeaders.authorizationHeader: 'Bearer $accessToken'};
 
@@ -330,71 +197,44 @@ Future<List<HeartRate>> _requestDataHR() async {
     Uri.parse(url),
     headers: headers,
   );
-  //print(Impact.startDate);
-  //print(url);
+
   print(response.statusCode);
+
   //Check response
-  //List<HeartRate> result_hr = [];
+
   if (response.statusCode == 200) {
     final decodedResponse = jsonDecode(response.body);
 
     for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
-      //print(decodedResponse['data']['data'][i]);
       resultHr.add(HeartRate.fromJson(decodedResponse['data']['data'][i]));
-      //print(result_hr[i]);
     }
   } else {
     print(response.statusCode);
   }
-  print('dimensione prima di passare:');
-  print(resultHr.length);
 
-  // print the result_hr elements
-
+  //insertHeartRates(heartRates, context)
   return resultHr;
 }
 
-Future<List<RestingHeartRate>> _requestDataRestingHR() async {
-  //initialize the result
-  List<RestingHeartRate> resultRestinghr = [];
-
-  //Get the access token from SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  var accessToken = prefs.getString('access');
-
-  //If the token is expired, refresh it
-  if (JwtDecoder.isExpired(accessToken!)) {
-    await _refreshToken();
-    accessToken = prefs.getString('access');
-  }
-
-  //Create request
-
-  //create a variable that is a week before the current date
-  final url = Impact.baseUrl + Impact.hrEndpoint;
-  final headers = {HttpHeaders.authorizationHeader: 'Bearer $accessToken'};
-
-  //Send request
-  final response = await http.get(
-    Uri.parse(url),
-    headers: headers,
+void insertHeartRates(List<HeartRate> heartRates, BuildContext context) {
+  final providerHR = Provider.of<ProviderHR>(
+    context,
+    listen: false,
   );
-  //print(Impact.startDate);
-  //print(url);
-  print(response.statusCode);
-  //Check response
 
-  if (response.statusCode == 200) {
-    final decodedResponse = jsonDecode(response.body);
+  // Questo è il for per inserire tutte le entry di una data
 
-    for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
-      //print(decodedResponse['data']['data'][i]);
-      resultRestinghr
-          .add(RestingHeartRate.fromJson(decodedResponse['data']['data'][i]));
-      //print(result_RestingHR[i]);
-    }
-  } else {
-    print(response.statusCode);
-  }
-  return resultRestinghr;
+  /*for (var heartRate in heartRates) {
+    providerHR.insertHR(HREntity(
+      '2023-06-26',
+      timeStringToDouble(heartRate.time),
+      heartRate.value,
+    ));
+  }*/
+
+  //Qui ho messo i dati a mano per fare una singola entry
+  var time = timeStringToDouble(heartRates[50].time);
+  var value = heartRates[50].value;
+
+  providerHR.insertHR(HREntity('2023-06-26', time, value));
 }
