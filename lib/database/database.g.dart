@@ -95,7 +95,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Report` (`date` TEXT NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY (`date`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `HREntity` (`date` TEXT NOT NULL, `time` REAL NOT NULL, `value` INTEGER NOT NULL, PRIMARY KEY (`date`))');
+            'CREATE TABLE IF NOT EXISTS `HREntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` TEXT NOT NULL, `time` REAL NOT NULL, `value` INTEGER NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Sleepentry` (`date` TEXT NOT NULL, `startTime` REAL NOT NULL, `endTime` REAL NOT NULL, `duration` REAL NOT NULL, `efficiency` INTEGER NOT NULL, PRIMARY KEY (`date`))');
 
@@ -252,6 +252,7 @@ class _$HRdao extends HRdao {
             database,
             'HREntity',
             (HREntity item) => <String, Object?>{
+                  'id': item.id,
                   'date': item.date,
                   'time': item.time,
                   'value': item.value
@@ -259,8 +260,9 @@ class _$HRdao extends HRdao {
         _hREntityDeletionAdapter = DeletionAdapter(
             database,
             'HREntity',
-            ['date'],
+            ['id'],
             (HREntity item) => <String, Object?>{
+                  'id': item.id,
                   'date': item.date,
                   'time': item.time,
                   'value': item.value
@@ -279,7 +281,7 @@ class _$HRdao extends HRdao {
   @override
   Future<List<HREntity>> findAllHR() async {
     return _queryAdapter.queryList('SELECT * FROM HREntity',
-        mapper: (Map<String, Object?> row) => HREntity(
+        mapper: (Map<String, Object?> row) => HREntity(row['id'] as int?,
             row['date'] as String, row['time'] as double, row['value'] as int));
   }
 

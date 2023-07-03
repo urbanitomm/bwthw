@@ -57,8 +57,7 @@ class _ProfileState extends State<Profile> {
         drawer: const MyDrawer(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => const Homepage()));
+            Navigator.pop(context);
           },
           child: const Icon(Icons.arrow_back),
         ),
