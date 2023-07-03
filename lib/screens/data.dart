@@ -36,35 +36,34 @@ class _DataState extends State<Data> {
   ];
 
   //...era qui//
+  Future<List<HeartRate>> _dataSourceFuture = Future.value([]);
+
+  List<HeartRate> heartRates = [];
+  Future<void> _loadData() async {
+    heartRates = await _dataSourceFuture;
+    setState(() {});
+    print('provaaaaa');
+    //print the size of the list
+    print(heartRates.length);
+    //pritn the type of time
+    print('type');
+    print(heartRates[1000].time.runtimeType);
+    print('time string');
+    print(heartRates[1000].time);
+    print('time double');
+    print(timeStringToDouble(heartRates[1000].time));
+  }
+
+  @override
+  void initState() {
+    print('inside init state');
+    _dataSourceFuture = _requestDataHR(context);
+    super.initState();
+    _loadData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    //////////////////////////////////////////////////////////////////////// DA QUI
-    final Future<List<HeartRate>> _dataSourceFuture = _requestDataHR(context);
-
-    List<HeartRate> heartRates = [];
-    Future<void> _loadData() async {
-      heartRates = await _dataSourceFuture;
-      setState(() {});
-      print('provaaaaa');
-      //print the size of the list
-      print(heartRates.length);
-      //pritn the type of time
-      print('type');
-      print(heartRates[1000].time.runtimeType);
-      print('time string');
-      print(heartRates[1000].time);
-      print('time double');
-      print(timeStringToDouble(heartRates[1000].time));
-    }
-
-    @override
-    void initState() {
-      super.initState();
-      _loadData();
-    }
-
-    ////////////////////////////////////////////////////////// FINO A QUI
     /// inserire in riga 76 per il DB
     return LineChart(LineChartData(
         minX: 0,
@@ -218,6 +217,7 @@ Future<List<HeartRate>> _requestDataHR(BuildContext context) async {
   }
 
   insertHeartRates(resultHr, context);
+  print('finished with DB');
   return resultHr;
 }
 
