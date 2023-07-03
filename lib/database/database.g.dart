@@ -65,6 +65,8 @@ class _$AppDatabase extends AppDatabase {
 
   ReportDao? _reportDaoInstance;
 
+  HRdao? _hRdaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -90,6 +92,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Diaryentry` (`date` TEXT NOT NULL, `entry` TEXT NOT NULL, `mood` TEXT NOT NULL, PRIMARY KEY (`date`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Report` (`date` TEXT NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY (`date`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `HREntity` (`date` TEXT NOT NULL, `time` REAL NOT NULL, `value` INTEGER NOT NULL, PRIMARY KEY (`date`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -105,6 +109,11 @@ class _$AppDatabase extends AppDatabase {
   @override
   ReportDao get reportDao {
     return _reportDaoInstance ??= _$ReportDao(database, changeListener);
+  }
+
+  @override
+  HRdao get hRdao {
+    return _hRdaoInstance ??= _$HRdao(database, changeListener);
   }
 }
 
@@ -222,5 +231,84 @@ class _$ReportDao extends ReportDao {
   @override
   Future<void> deleteReport(Report report) async {
     await _reportDeletionAdapter.delete(report);
+  }
+}
+
+class _$HRdao extends HRdao {
+  _$HRdao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _hREntityInsertionAdapter = InsertionAdapter(
+            database,
+            'HREntity',
+            (HREntity item) => <String, Object?>{
+                  'date': item.date,
+                  'time': item.time,
+                  'value': item.value
+                }),
+        _hREntityDeletionAdapter = DeletionAdapter(
+            database,
+            'HREntity',
+            ['date'],
+            (HREntity item) => <String, Object?>{
+                  'date': item.date,
+                  'time': item.time,
+                  'value': item.value
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<HREntity> _hREntityInsertionAdapter;
+
+  final DeletionAdapter<HREntity> _hREntityDeletionAdapter;
+
+  @override
+  Future<List<HREntity>> findAllHR() async {
+    return _queryAdapter.queryList('SELECT * FROM HREntity',
+        mapper: (Map<String, Object?> row) => HREntity(
+            row['date'] as String, row['time'] as double, row['value'] as int));
+  }
+
+  @override
+  Future<List<int?>> findEntriesAfter(
+    String date,
+    double time,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT value FROM HREntity WHERE (date = ?1) AND (time >= ?2)',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [date, time]);
+  }
+
+  @override
+  Future<List<int?>> findEntriesBefore(
+    String date,
+    double time,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT value FROM HREntity WHERE (date = ?1) AND (time <= ?2)',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [date, time]);
+  }
+
+  @override
+  Future<int?> howManyHR() async {
+    return _queryAdapter.query('SELECT COUNT(*) FROM HREntity',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Future<void> insertHR(HREntity hrentity) async {
+    await _hREntityInsertionAdapter.insert(hrentity, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteHR(HREntity hrentity) async {
+    await _hREntityDeletionAdapter.delete(hrentity);
   }
 }
