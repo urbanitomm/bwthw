@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+//import 'dart:js_util';
 //import 'dart:js' as js;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -189,6 +190,10 @@ Future<List<HeartRate>> _requestDataHR() async {
   }
 
   //Create request
+  //DateTime date = DateTime.now().subtract(const Duration(days: 1));
+  //String hrEndpoint = getHrEndpoint(date);
+
+  //final url = Impact.baseUrl + hrEndpoint;
   final url = Impact.baseUrl + Impact.hrEndpoint;
   final headers = {HttpHeaders.authorizationHeader: 'Bearer $accessToken'};
 

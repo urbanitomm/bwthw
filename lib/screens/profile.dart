@@ -15,6 +15,9 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   bool isDarkModeEnabled = false; //default value
+  String name = '';
+  String surname = '';
+  String email = '';
 
   @override
   void initState() {
@@ -26,6 +29,9 @@ class _ProfileState extends State<Profile> {
     final sp = await SharedPreferences.getInstance();
     setState(() {
       isDarkModeEnabled = sp.getBool('isDarkModeEnabled') ?? false;
+      name = sp.getString('name') ?? 'Giacomo';
+      surname = sp.getString('surname') ?? 'Cappon';
+      email = sp.getString('email') ?? '1234@567.com';
     });
   }
 
@@ -53,33 +59,45 @@ class _ProfileState extends State<Profile> {
               ),
             ),
       home: Scaffold(
-        appBar: const MyAppbar(),
-        drawer: const MyDrawer(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => const Homepage()));
-          },
-          child: const Icon(Icons.arrow_back),
-        ),
-        body: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.face,
-                  size: 30,
+          appBar: const MyAppbar(),
+          drawer: const MyDrawer(),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Homepage()));
+            },
+            child: const Icon(Icons.arrow_back),
+          ),
+          body: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.4,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      image: AssetImage('assets/images/img.jpg'),
+                      fit: BoxFit.cover),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    '$name $surname',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    leading: const Icon(Icons.email),
+                    title: Text(email),
+                  )
+                ],
+              ),
+            ],
+          )),
     );
   }
 }
