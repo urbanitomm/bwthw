@@ -55,8 +55,8 @@ class OptionState extends State<OptionS> {
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.remove("username");
     print('SP cleaned');
-    Navigator.pushAndRemoveUntil(
-        context, MaterialPageRoute(builder: (_) => const Login()), (route) => false);
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (_) => const Login()), (route) => false);
   }
 
   @override

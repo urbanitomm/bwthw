@@ -65,10 +65,7 @@ class SelfReportState extends State<SelfReport> {
         appBar: const MyAppbar(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Homepage()),
-            );
+            Navigator.pop(context);
           },
           child: const Icon(Icons.arrow_back),
         ),

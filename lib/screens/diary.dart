@@ -82,13 +82,6 @@ class _DiaryState extends State<Diary> {
         home: Scaffold(
           appBar: const MyAppbar(),
           drawer: const MyDrawer(),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => const Homepage()));
-            },
-            child: const Icon(Icons.arrow_back),
-          ),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -231,8 +224,10 @@ class _DiaryState extends State<Diary> {
           .insertDiaryentry(
               Diaryentry(getTodayDate(), _entryText!, _entryMood!));
 
-      Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (_) => const Homepage()), (route) => false);
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const Homepage()),
+          (route) => false);
     }
   }
 } //HomePage

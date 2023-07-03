@@ -35,37 +35,37 @@ class _DataState extends State<Data> {
     const Color(0xff02d39a),
   ];
 
-  //////////////////////////////////////////////////////////////////////// DA QUI
-  final Future<List<HeartRate>> _dataSourceFuture = _requestDataHR();
-
-  List<HeartRate> heartRates = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    heartRates = await _dataSourceFuture;
-    setState(() {});
-    print('provaaaaa');
-    //print the size of the list
-    print(heartRates.length);
-    //pritn the type of time
-    print('type');
-    print(heartRates[1000].time.runtimeType);
-    print('time string');
-    print(heartRates[1000].time);
-    print('time double');
-    print(timeStringToDouble(heartRates[1000].time));
-  }
-
-  ////////////////////////////////////////////////////////// FINO A QUI
-  /// inserire in riga 76 per il DB
+  //...era qui//
 
   @override
   Widget build(BuildContext context) {
+    //////////////////////////////////////////////////////////////////////// DA QUI
+    final Future<List<HeartRate>> _dataSourceFuture = _requestDataHR(context);
+
+    List<HeartRate> heartRates = [];
+    Future<void> _loadData() async {
+      heartRates = await _dataSourceFuture;
+      setState(() {});
+      print('provaaaaa');
+      //print the size of the list
+      print(heartRates.length);
+      //pritn the type of time
+      print('type');
+      print(heartRates[1000].time.runtimeType);
+      print('time string');
+      print(heartRates[1000].time);
+      print('time double');
+      print(timeStringToDouble(heartRates[1000].time));
+    }
+
+    @override
+    void initState() {
+      super.initState();
+      _loadData();
+    }
+
+    ////////////////////////////////////////////////////////// FINO A QUI
+    /// inserire in riga 76 per il DB
     return LineChart(LineChartData(
         minX: 0,
         minY: 0,
@@ -172,8 +172,8 @@ Future<int> _refreshToken() async {
 }
 // This method allows to obtain the data from IMPACT
 
-Future<List<HeartRate>> _requestDataHR() async {
-  // PER DB:  Future<List<HeartRate>> _requestDataHR(BuildContext context) async {
+//Future<List<HeartRate>> _requestDataHR() async {
+Future<List<HeartRate>> _requestDataHR(BuildContext context) async {
   final result = await _authorize();
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
@@ -217,29 +217,29 @@ Future<List<HeartRate>> _requestDataHR() async {
     print(response.statusCode);
   }
 
-  //insertHeartRates(heartRates, context)
+  insertHeartRates(resultHr, context);
   return resultHr;
 }
 
 void insertHeartRates(List<HeartRate> heartRates, BuildContext context) {
-  final providerHR = Provider.of<ProviderHR>(
+  var providerHR = Provider.of<ProviderHR>(
     context,
     listen: false,
   );
 
   // Questo è il for per inserire tutte le entry di una data
-
-  /*for (var heartRate in heartRates) {
+  for (var heartRate in heartRates) {
     providerHR.insertHR(HREntity(
+      null,
       '2023-06-26',
       timeStringToDouble(heartRate.time),
       heartRate.value,
     ));
-  }*/
-
+  }
+  print(providerHR);
   //Qui ho messo i dati a mano per fare una singola entry
-  var time = timeStringToDouble(heartRates[50].time);
+  /*var time = timeStringToDouble(heartRates[50].time);
   var value = heartRates[50].value;
 
-  providerHR.insertHR(HREntity('2023-06-26', time, value));
+  providerHR.insertHR(HREntity('2023-06-26', time, value));*/
 }
