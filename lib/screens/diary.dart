@@ -85,9 +85,9 @@ class _DiaryState extends State<Diary> {
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Homepage()));
+                  context, MaterialPageRoute(builder: (context) => const Homepage()));
             },
-            child: Icon(Icons.arrow_back),
+            child: const Icon(Icons.arrow_back),
           ),
           body: Center(
             child: Column(
@@ -229,7 +229,7 @@ class _DiaryState extends State<Diary> {
               Diaryentry(getTodayDate(), _entryText!, _entryMood!));
 
       Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (_) => Homepage()), (route) => false);
+          MaterialPageRoute(builder: (_) => const Homepage()), (route) => false);
     }
   }
 } //HomePage

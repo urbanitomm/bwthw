@@ -70,10 +70,10 @@ class _HomeState extends State<Homepage> {
       case 1:
         print('2');
         print('2');
-        return Data();
+        return const Data();
       case 2:
         print('3');
-        return Calendar();
+        return const Calendar();
 
       default:
         return const Home();

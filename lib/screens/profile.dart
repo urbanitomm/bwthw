@@ -53,16 +53,16 @@ class _ProfileState extends State<Profile> {
               ),
             ),
       home: Scaffold(
-        appBar: MyAppbar(),
-        drawer: MyDrawer(),
+        appBar: const MyAppbar(),
+        drawer: const MyDrawer(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Homepage()));
+                context, MaterialPageRoute(builder: (context) => const Homepage()));
           },
-          child: Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back),
         ),
-        body: Row(
+        body: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(

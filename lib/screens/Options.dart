@@ -10,7 +10,7 @@ class Options extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: OptionS(),
     );
@@ -56,7 +56,7 @@ class OptionState extends State<OptionS> {
     await sharedPreferences.remove("username");
     print('SP cleaned');
     Navigator.pushAndRemoveUntil(
-        context, MaterialPageRoute(builder: (_) => Login()), (route) => false);
+        context, MaterialPageRoute(builder: (_) => const Login()), (route) => false);
   }
 
   @override
@@ -64,16 +64,16 @@ class OptionState extends State<OptionS> {
     print('Build optionPage');
     return MaterialApp(
       home: Scaffold(
-        appBar: MyAppbar(),
-        drawer: MyDrawer(),
+        appBar: const MyAppbar(),
+        drawer: const MyDrawer(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Homepage()),
+              MaterialPageRoute(builder: (context) => const Homepage()),
             );
           },
-          child: Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back),
         ),
         body: Column(
           children: <Widget>[

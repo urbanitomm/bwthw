@@ -220,7 +220,7 @@ class CalendarDiary extends State<CustomAgenda> {
         endTime:
             DateTime.parse(report.date).add(const Duration(hours: 5, days: -1)),
         subject: report.content,
-        color: Color.fromARGB(255, 76, 147, 175),
+        color: const Color.fromARGB(255, 76, 147, 175),
         isAllDay: true,
       ));
     }

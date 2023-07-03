@@ -68,7 +68,7 @@ class Homestate extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SelfReport()));
+                              builder: (context) => const SelfReport()));
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey,
@@ -83,7 +83,7 @@ class Homestate extends State<Home> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Contacts()));
+                        MaterialPageRoute(builder: (context) => const Contacts()));
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,

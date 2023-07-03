@@ -67,10 +67,10 @@ class SelfReportState extends State<SelfReport> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Homepage()),
+              MaterialPageRoute(builder: (context) => const Homepage()),
             );
           },
-          child: Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back),
         ),
         body: Center(
           child: Column(
@@ -126,7 +126,7 @@ class SelfReportState extends State<SelfReport> {
                 ),
               ),
               const SizedBox(height: 30),
-              Container(
+              SizedBox(
                 width: 300.0,
                 child: TextField(
                   controller: textController2,
@@ -173,7 +173,7 @@ class SelfReportState extends State<SelfReport> {
                 ),
               ),
               const SizedBox(height: 30),
-              Container(
+              SizedBox(
                 width: 300.0,
                 child: TextField(
                   controller: textController3,
@@ -252,7 +252,7 @@ class SelfReportState extends State<SelfReport> {
         .insertReport(Report(getTodayDate(), mergedInput));
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Homepage()),
+      MaterialPageRoute(builder: (context) => const Homepage()),
     );
   }
 }

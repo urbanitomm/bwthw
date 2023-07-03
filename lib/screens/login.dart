@@ -78,13 +78,13 @@ class _LoginPage extends State<Login> {
                 _toDiaryPage(context);
               },
               theme: LoginTheme(
-                primaryColor: Color.fromARGB(255, 129, 7, 143),
+                primaryColor: const Color.fromARGB(255, 129, 7, 143),
                 accentColor: Colors.yellow,
                 errorColor: Colors.deepOrange,
                 cardTheme: CardTheme(
-                  color: Color.fromARGB(255, 88, 170, 236),
+                  color: const Color.fromARGB(255, 88, 170, 236),
                   elevation: 5,
-                  margin: EdgeInsets.only(top: 15),
+                  margin: const EdgeInsets.only(top: 15),
                   shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(100.0),
                   ),

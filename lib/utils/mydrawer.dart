@@ -35,7 +35,7 @@ class MyDrawer extends StatelessWidget {
             title: const Text("Profile"),
             onTap: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Profile()));
+                  context, MaterialPageRoute(builder: (context) => const Profile()));
             },
           ),
           ListTile(
@@ -43,7 +43,7 @@ class MyDrawer extends StatelessWidget {
             title: const Text("Options"),
             onTap: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Options()));
+                  context, MaterialPageRoute(builder: (context) => const Options()));
             },
           ),
           ListTile(
@@ -68,6 +68,6 @@ class MyDrawer extends StatelessWidget {
 
     //Then pop the HomePage
     Navigator.pushAndRemoveUntil(
-        context, MaterialPageRoute(builder: (_) => Login()), (route) => false);
+        context, MaterialPageRoute(builder: (_) => const Login()), (route) => false);
   } //_toCalendarPage
 }
