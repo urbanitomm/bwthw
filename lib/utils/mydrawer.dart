@@ -14,7 +14,7 @@ class MyDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Colors.yellow,
             ),
             child: Stack(
               children: [
@@ -31,24 +31,39 @@ class MyDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.account_box),
-            title: const Text("Profile"),
+            leading: const Icon(
+              Icons.account_box,
+              color: Color.fromARGB(255, 129, 7, 143),
+              size: 45,
+            ),
+            title: const Text("PROFILE", style: TextStyle(fontSize: 17)),
+            selectedColor: Colors.yellow,
             onTap: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => const Profile()));
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text("Options"),
+            leading: const Icon(
+              Icons.settings,
+              color: Color.fromARGB(255, 129, 7, 143),
+              size: 50,
+            ),
+            title: const Text("OPTIONS", style: TextStyle(fontSize: 17)),
+            selectedColor: Colors.yellow,
             onTap: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => const Options()));
             },
           ),
           ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Logout"),
+              leading: const Icon(
+                Icons.logout,
+                color: Color.fromARGB(255, 129, 7, 143),
+                size: 50,
+              ),
+              title: const Text("LOGOUT", style: TextStyle(fontSize: 17)),
+              selectedColor: Colors.yellow,
               onTap: () async {
                 //Logging out the shared preferences for the profile are deleted
                 SharedPreferences sp = await SharedPreferences.getInstance();

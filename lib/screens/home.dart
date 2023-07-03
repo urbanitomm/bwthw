@@ -41,7 +41,7 @@ class Homestate extends State<Home> {
                   primary: Colors.black,
                   background: Colors.black,
                   onBackground: Colors.black,
-                  secondary: Colors.blue,
+                  secondary: Colors.yellow,
                 ),
               )
             : ThemeData(
@@ -50,7 +50,7 @@ class Homestate extends State<Home> {
                   primary: Color.fromARGB(190, 71, 70, 70),
                   background: Color.fromARGB(255, 0, 0, 0),
                   onBackground: Colors.white,
-                  secondary: Colors.blue,
+                  secondary: Colors.yellow,
                 ),
               ),
         home: Scaffold(
@@ -71,12 +71,12 @@ class Homestate extends State<Home> {
                               builder: (context) => const SelfReport()));
                     },
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey,
+                        backgroundColor: Color.fromARGB(255, 129, 7, 143),
                         fixedSize: const Size(200, 70),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30))),
                     child: const Text('Self report',
-                        style: TextStyle(fontSize: 25))),
+                        style: TextStyle(fontSize: 25, color: Colors.black))),
                 const SizedBox(
                   height: 50,
                 ),
@@ -86,12 +86,12 @@ class Homestate extends State<Home> {
                         MaterialPageRoute(builder: (context) => const Contacts()));
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.yellow,
                       fixedSize: const Size(200, 70),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   child: const Text('Ask for help',
-                      style: TextStyle(fontSize: 25)),
+                      style: TextStyle(fontSize: 25, color: Colors.black)),
                 ),
               ],
             ),
