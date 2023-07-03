@@ -2,6 +2,7 @@ import 'package:progetto_wearable/database/database.dart';
 import 'package:progetto_wearable/repository/databaseRepository.dart';
 import 'package:progetto_wearable/repository/providerDataBaseSR.dart';
 import 'package:progetto_wearable/repository/providerHR.dart';
+import 'package:progetto_wearable/repository/providerSleep.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/screens/login.dart';
@@ -24,11 +25,17 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<DatabaseRepository>.value(
-            value: databaseRepository),
+          value: databaseRepository,
+        ),
         ChangeNotifierProvider<SelfReportProvider>(
-            create: (_) => SelfReportProvider(database: database)),
+          create: (_) => SelfReportProvider(database: database),
+        ),
         ChangeNotifierProvider<ProviderHR>(
-            create: (_) => ProviderHR(database: database)),
+          create: (_) => ProviderHR(database: database),
+        ),
+        ChangeNotifierProvider<ProviderSleep>(
+          create: (_) => ProviderSleep(database: database),
+        ),
       ],
       child: const MyApp(),
     ),

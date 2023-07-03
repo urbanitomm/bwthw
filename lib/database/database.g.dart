@@ -67,6 +67,8 @@ class _$AppDatabase extends AppDatabase {
 
   HRdao? _hRdaoInstance;
 
+  SleepDao? _sleepDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -94,6 +96,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Report` (`date` TEXT NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY (`date`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `HREntity` (`date` TEXT NOT NULL, `time` REAL NOT NULL, `value` INTEGER NOT NULL, PRIMARY KEY (`date`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Sleepentry` (`date` TEXT NOT NULL, `startTime` REAL NOT NULL, `endTime` REAL NOT NULL, `duration` REAL NOT NULL, `efficiency` INTEGER NOT NULL, PRIMARY KEY (`date`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -114,6 +118,11 @@ class _$AppDatabase extends AppDatabase {
   @override
   HRdao get hRdao {
     return _hRdaoInstance ??= _$HRdao(database, changeListener);
+  }
+
+  @override
+  SleepDao get sleepDao {
+    return _sleepDaoInstance ??= _$SleepDao(database, changeListener);
   }
 }
 
@@ -310,5 +319,103 @@ class _$HRdao extends HRdao {
   @override
   Future<void> deleteHR(HREntity hrentity) async {
     await _hREntityDeletionAdapter.delete(hrentity);
+  }
+}
+
+class _$SleepDao extends SleepDao {
+  _$SleepDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _sleepentryInsertionAdapter = InsertionAdapter(
+            database,
+            'Sleepentry',
+            (Sleepentry item) => <String, Object?>{
+                  'date': item.date,
+                  'startTime': item.startTime,
+                  'endTime': item.endTime,
+                  'duration': item.duration,
+                  'efficiency': item.efficiency
+                }),
+        _sleepentryDeletionAdapter = DeletionAdapter(
+            database,
+            'Sleepentry',
+            ['date'],
+            (Sleepentry item) => <String, Object?>{
+                  'date': item.date,
+                  'startTime': item.startTime,
+                  'endTime': item.endTime,
+                  'duration': item.duration,
+                  'efficiency': item.efficiency
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Sleepentry> _sleepentryInsertionAdapter;
+
+  final DeletionAdapter<Sleepentry> _sleepentryDeletionAdapter;
+
+  @override
+  Future<List<Sleepentry>> findAllSleep() async {
+    return _queryAdapter.queryList('SELECT * FROM Sleepentry',
+        mapper: (Map<String, Object?> row) => Sleepentry(
+            row['date'] as String,
+            row['startTime'] as double,
+            row['endTime'] as double,
+            row['duration'] as double,
+            row['efficiency'] as int));
+  }
+
+  @override
+  Future<double?> findStartTime(String date) async {
+    return _queryAdapter.query(
+        'SELECT startTime FROM Sleepentry WHERE (date = ?1)',
+        mapper: (Map<String, Object?> row) => row.values.first as double,
+        arguments: [date]);
+  }
+
+  @override
+  Future<double?> findEndTime(String date) async {
+    return _queryAdapter.query(
+        'SELECT endTime FROM Sleepentry WHERE (date = ?1)',
+        mapper: (Map<String, Object?> row) => row.values.first as double,
+        arguments: [date]);
+  }
+
+  @override
+  Future<double?> findDuration(String date) async {
+    return _queryAdapter.query(
+        'SELECT duration FROM Sleepentry WHERE (date = ?1)',
+        mapper: (Map<String, Object?> row) => row.values.first as double,
+        arguments: [date]);
+  }
+
+  @override
+  Future<double?> findEfficiency(String date) async {
+    return _queryAdapter.query(
+        'SELECT efficiency FROM Sleepentry WHERE (date = ?1)',
+        mapper: (Map<String, Object?> row) => row.values.first as double,
+        arguments: [date]);
+  }
+
+  @override
+  Future<int?> howManySleep() async {
+    return _queryAdapter.query('SELECT COUNT(*) FROM Sleepentry',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Future<void> insertSleep(Sleepentry sleepentry) async {
+    await _sleepentryInsertionAdapter.insert(
+        sleepentry, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteSleep(Sleepentry sleepentry) async {
+    await _sleepentryDeletionAdapter.delete(sleepentry);
   }
 }
