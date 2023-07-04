@@ -20,6 +20,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:progetto_wearable/repository/providerHR.dart';
 import 'package:progetto_wearable/repository/providerSleep.dart';
+import 'package:progetto_wearable/database/entities/sleepentry.dart';
+import 'package:progetto_wearable/utils/funcs.dart';
 
 class Data extends StatefulWidget {
   static const route = '/data/';
@@ -282,30 +284,21 @@ Future<List<HeartRate>> _requestDataHR(
 
 void insertHeartRates(
     List<HeartRate> heartRates, BuildContext context, String dateFormatted) {
-  var providerHR = Provider.of<ProviderHR>(
-    context,
-    listen: false,
-  );
-
+  List<HREntity> hrEntities = [];
   // Questo è il for per inserire tutte le entry di una data
   for (var heartRate in heartRates) {
-    providerHR.insertHR(HREntity(
+    var hrEntity = HREntity(
       null,
       dateFormatted,
       timeStringToDouble(heartRate.time),
       heartRate.value,
-    ));
+    );
+    hrEntities.add(hrEntity);
   }
-
+  Provider.of<ProviderHR>(context, listen: false).insertMultipleHR(hrEntities);
+  print('inserted HR in the DB');
   //call the function _requestDataSleep
   _requestDataSleep(context, dateFormatted);
-
-  print(providerHR);
-  //Qui ho messo i dati a mano per fare una singola entry
-  /*var time = timeStringToDouble(heartRates[50].time);
-  var value = heartRates[50].value;
-
-  providerHR.insertHR(HREntity('2023-06-26', time, value));*/
 }
 
 // This method allows to obtain the Sleep data from IMPACT
@@ -367,22 +360,46 @@ Future<List<Sleep>> _requestDataSleep(
 
 void insertSleep(
     List<Sleep> sleeps, BuildContext context, String dateFormatted) {
-  var providerSleep = Provider.of<ProviderSleep>(
+  List<Sleepentry> SleepEn = [];
+
+  for (var sleep in sleeps) {
+    var sl = Sleepentry(
+      sleep.dateOfSleep,
+      timeStringToDouble(sleep.startTime),
+      timeStringToDouble(sleep.endTime),
+      sleep.duration,
+      sleep.efficiency,
+    );
+    SleepEn.add(sl);
+  }
+  Provider.of<ProviderSleep>(context, listen: false).insertMultiSleep(SleepEn);
+  print('inserted sleep in the DB');
+}
+//vecchio metodo per inserire i dati nel DB
+/*void insertHeartRates(
+    List<HeartRate> heartRates, BuildContext context, String dateFormatted) {
+  var providerHR = Provider.of<ProviderHR>(
     context,
     listen: false,
   );
 
-  // Mi dà problemi con Sleepentry non capisco il motivo
-  /*
-  for (var sleep in sleeps) {
-    providerSleep.insertSleep(Sleepentry(
-      sleep.dateOfSleep,
-      sleep.startTime,
-      sleep.endTime,
-      sleep.duration,
-      sleep.efficiency,
+  // Questo è il for per inserire tutte le entry di una data
+  for (var heartRate in heartRates) {
+    providerHR.insertHR(HREntity(
+      null,
+      dateFormatted,
+      timeStringToDouble(heartRate.time),
+      heartRate.value,
     ));
-  } */
+  }
 
-  print(providerSleep);
-}
+  //call the function _requestDataSleep
+  _requestDataSleep(context, dateFormatted);
+
+  print(providerHR);
+  //Qui ho messo i dati a mano per fare una singola entry
+  /*var time = timeStringToDouble(heartRates[50].time);
+  var value = heartRates[50].value;
+
+  providerHR.insertHR(HREntity('2023-06-26', time, value));*/
+}*/

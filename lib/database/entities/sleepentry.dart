@@ -4,15 +4,15 @@ import 'package:floor/floor.dart';
 @entity
 class Sleepentry {
   @primaryKey
-  final String date;
+  final String? date;
 
-  final double startTime;
+  final double? startTime;
 
-  final double endTime;
+  final double? endTime;
 
-  final double duration;
+  final double? duration;
 
-  final int efficiency;
+  final int? efficiency;
 
   //Default constructor
   Sleepentry(

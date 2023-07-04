@@ -30,8 +30,12 @@ abstract class SleepDao {
   Future<double?> findEfficiency(String date);
 
   //Query #4: INSERT -> this allows to add a Sleepentry in the table
-  @insert
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertSleep(Sleepentry sleepentry);
+
+  //Query #4: INSERT -> this allows to add a list of Sleepentry in the table
+  @Insert(onConflict: OnConflictStrategy.replace)
+  Future<void> insertMultiSleep(List<Sleepentry> sleepentry);
 
   //Query #5: DELETE -> this allows to delete a Sleepentry from the table
   @delete

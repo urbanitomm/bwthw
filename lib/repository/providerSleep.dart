@@ -47,6 +47,13 @@ class ProviderSleep extends ChangeNotifier {
     notifyListeners();
   }
 
+  //This method wraps the insertMultiSleep() method of the DAO.
+  //Then, it notifies the listeners that something changed.
+  Future<void> insertMultiSleep(List<Sleepentry> multisleepentry) async {
+    await database.sleepDao.insertMultiSleep(multisleepentry);
+    notifyListeners();
+  }
+
   //This method wraps the deleteSleep() method of the DAO.
   //Then, it notifies the listeners that something changed.
   Future<void> deleteSleep(Sleepentry sleepentry) async {

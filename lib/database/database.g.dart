@@ -97,7 +97,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `HREntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` TEXT NOT NULL, `time` REAL NOT NULL, `value` INTEGER NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Sleepentry` (`date` TEXT NOT NULL, `startTime` REAL NOT NULL, `endTime` REAL NOT NULL, `duration` REAL NOT NULL, `efficiency` INTEGER NOT NULL, PRIMARY KEY (`date`))');
+            'CREATE TABLE IF NOT EXISTS `Sleepentry` (`date` TEXT, `startTime` REAL, `endTime` REAL, `duration` REAL, `efficiency` INTEGER, PRIMARY KEY (`date`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -371,11 +371,11 @@ class _$SleepDao extends SleepDao {
   Future<List<Sleepentry>> findAllSleep() async {
     return _queryAdapter.queryList('SELECT * FROM Sleepentry',
         mapper: (Map<String, Object?> row) => Sleepentry(
-            row['date'] as String,
-            row['startTime'] as double,
-            row['endTime'] as double,
-            row['duration'] as double,
-            row['efficiency'] as int));
+            row['date'] as String?,
+            row['startTime'] as double?,
+            row['endTime'] as double?,
+            row['duration'] as double?,
+            row['efficiency'] as int?));
   }
 
   @override
@@ -419,7 +419,13 @@ class _$SleepDao extends SleepDao {
   @override
   Future<void> insertSleep(Sleepentry sleepentry) async {
     await _sleepentryInsertionAdapter.insert(
-        sleepentry, OnConflictStrategy.abort);
+        sleepentry, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMultiSleep(List<Sleepentry> sleepentry) async {
+    await _sleepentryInsertionAdapter.insertList(
+        sleepentry, OnConflictStrategy.replace);
   }
 
   @override
