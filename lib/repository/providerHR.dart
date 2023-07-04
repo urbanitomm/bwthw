@@ -35,6 +35,12 @@ class ProviderHR extends ChangeNotifier {
     notifyListeners();
   } //insertDiaryentry
 
+  //This method wraps the insertMultipleDiaryentries() method of the DAO.
+  Future<void> insertMultipleHR(List<HREntity> hrentity) async {
+    await database.hRdao.insertMultipleHR(hrentity);
+    notifyListeners();
+  } //insertMultipleDiaryentries
+
   //This method wraps the deleteDiaryentry() method of the DAO.
   //Then, it notifies the listeners that something changed.
   Future<void> deleteHR(HREntity hrentity) async {

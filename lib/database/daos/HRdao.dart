@@ -19,11 +19,15 @@ abstract class HRdao {
   @Query('SELECT value FROM HREntity WHERE (date = :date) AND (time <= :time)')
   Future<List<int?>> findEntriesBefore(String date, double time);
 
-  //Query #4: INSERT -> this allows to add a Report in the table
+  //Query #4: INSERT -> this allows to add a HR in the table
   @insert
   Future<void> insertHR(HREntity hrentity);
 
-  //Query #5: DELETE -> this allows to delete a Report from the table
+  //Query #4: INSERT -> this allows to add multiple  HR in the table
+  @insert
+  Future<void> insertMultipleHR(List<HREntity> hrentity);
+
+  //Query #5: DELETE -> this allows to delete a HR from the table
   @delete
   Future<void> deleteHR(HREntity hrentity);
 

@@ -235,8 +235,8 @@ void insertHeartRates(List<HeartRate> heartRates, BuildContext context) {
       timeStringToDouble(heartRate.time),
       heartRate.value,
     ));
-  }
-  print(providerHR);
+  } //alternativa usare insertMultipleHR(List<HREntity>)
+
   //Qui ho messo i dati a mano per fare una singola entry
   /*var time = timeStringToDouble(heartRates[50].time);
   var value = heartRates[50].value;

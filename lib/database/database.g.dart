@@ -319,6 +319,12 @@ class _$HRdao extends HRdao {
   }
 
   @override
+  Future<void> insertMultipleHR(List<HREntity> hrentity) async {
+    await _hREntityInsertionAdapter.insertList(
+        hrentity, OnConflictStrategy.abort);
+  }
+
+  @override
   Future<void> deleteHR(HREntity hrentity) async {
     await _hREntityDeletionAdapter.delete(hrentity);
   }
