@@ -16,6 +16,12 @@ class ProviderSleep extends ChangeNotifier {
     return results;
   } //findAllDiaryentries
 
+  //This method wraps the findDateSleep() method of the DAO
+  Future<Sleepentry?> findDateSleep(String date) async {
+    final results = await database.sleepDao.findDateSleep(date);
+    return results;
+  } //findAllDiaryentries
+
   //This method wraps the findStartTime() method of the DAO
   Future<double?> findStartTime(String date) async {
     final results = await database.sleepDao.findStartTime(date);

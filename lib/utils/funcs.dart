@@ -37,7 +37,10 @@ double dateTimeToDouble(DateTime dateTime) {
   return dateTime.millisecondsSinceEpoch / 1000;
 }
 
-double timeStringToDouble(String timeString) {
+double timeStringToDouble(String? timeString) {
+  if (timeString == null) {
+    return 90000;
+  }
   List<String> components = timeString.split(':');
   if (components.length != 3) {
     return 0;
@@ -46,6 +49,23 @@ double timeStringToDouble(String timeString) {
   int minutes = int.tryParse(components[1]) ?? 0;
   int seconds = int.tryParse(components[2]) ?? 0;
   return (hours * 3600 + minutes * 60 + seconds).toDouble();
+}
+
+String doubleToString(double? timeDouble) {
+  if (timeDouble == null) {
+    return 'the input is null';
+  }
+  int totalSeconds = timeDouble.toInt();
+
+  int hours = totalSeconds ~/ 3600;
+  int minutes = (totalSeconds % 3600) ~/ 60;
+  int seconds = totalSeconds % 60;
+
+  String hoursString = hours.toString().padLeft(2, '0');
+  String minutesString = minutes.toString().padLeft(2, '0');
+  String secondsString = seconds.toString().padLeft(2, '0');
+
+  return '$hoursString:$minutesString:$secondsString';
 }
 
 call(String celln) async {

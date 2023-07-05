@@ -82,7 +82,7 @@ class MyDrawer extends StatelessWidget {
             selectedColor: Colors.yellow,
             onTap: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const prova()));
+                  MaterialPageRoute(builder: (context) => const Prova()));
             },
           ),
         ],

@@ -11,6 +11,11 @@ abstract class SleepDao {
 
   //Query #2: SELECT WHERE-> this allows to obtain the startTime of the Sleep table
   //from a specific date
+  @Query('SELECT * FROM Sleepentry WHERE (date = :date) ')
+  Future<Sleepentry?> findDateSleep(String date);
+
+  //Query #2: SELECT WHERE-> this allows to obtain the startTime of the Sleep table
+  //from a specific date
   @Query('SELECT startTime FROM Sleepentry WHERE (date = :date) ')
   Future<double?> findStartTime(String date);
 

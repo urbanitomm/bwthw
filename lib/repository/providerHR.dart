@@ -16,6 +16,11 @@ class ProviderHR extends ChangeNotifier {
     return results;
   } //findAllDiaryentries
 
+  Future<List<HREntity>> findDateEntry(String date) async {
+    final results = await database.hRdao.findDateEntry(date);
+    return results;
+  } //findDateEntry
+
   //This method wraps the findEntriesWhere() method of the DAO
   Future<List<int?>> findEntriesAfter(String date, double time) async {
     final results = await database.hRdao.findEntriesAfter(date, time);

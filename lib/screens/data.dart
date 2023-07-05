@@ -76,7 +76,8 @@ class _DataState extends State<Data> {
   @override
   Widget build(BuildContext context) {
     /// inserire in riga 76 per il DB
-    return Column(
+    return SingleChildScrollView(
+        child: Column(
       children: [
         TextField(
           controller: _dateController,
@@ -156,7 +157,7 @@ class _DataState extends State<Data> {
           ),
         ),
       ],
-    );
+    ));
   }
 }
 
@@ -302,12 +303,12 @@ void insertHeartRates(
 }
 
 // This method allows to obtain the Sleep data from IMPACT
-Future<List<Sleep>> _requestDataSleep(
+Future<Sleep?> _requestDataSleep(
     BuildContext context, String dateFormatted) async {
   final result = await _authorize();
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
-  List<Sleep> resultSleep = [];
+  Sleep? resultSleep = null;
 
   //Get the access token from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
@@ -345,9 +346,9 @@ Future<List<Sleep>> _requestDataSleep(
     final decodedResponse = jsonDecode(response.body);
 
     for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
-      resultSleep.add(Sleep.fromJson(decodedResponse['data']['data'][i]));
+      resultSleep = (Sleep.fromJson(decodedResponse['data']['data'][i]));
       print('sleep');
-      print(resultSleep[i]);
+      print(resultSleep);
     }
   } else {
     print('error' + response.statusCode.toString());
@@ -359,10 +360,50 @@ Future<List<Sleep>> _requestDataSleep(
 }
 
 void insertSleep(
-    List<Sleep> sleeps, BuildContext context, String dateFormatted) {
-  List<Sleepentry> SleepEn = [];
+    Sleep? sleeps, BuildContext context, String dateFormatted) async {
+  var sl;
 
+  sl = Sleepentry(
+    dateFormatted,
+    timeStringToDouble(sleeps?.startTime),
+    timeStringToDouble(sleeps?.endTime),
+    sleeps?.duration,
+    sleeps?.efficiency,
+  );
+  print('prova1');
+  print(
+    sleeps?.dateOfSleep,
+  );
+  print(sleeps?.startTime);
+  print(sleeps?.endTime);
+  print('sleep Entry is');
+  print(sl.date);
+  print(sl.startTime);
+  print(sl.endTime);
+  print(sl.duration);
+  print(sl.efficiency);
+  Provider.of<ProviderSleep>(context, listen: false).insertSleep(sl);
+  Sleepentry? sl1 = await Provider.of<ProviderSleep>(context, listen: false)
+      .findDateSleep(sl.date);
+  print('sleep Entry extracted is');
+  print(sl1?.date);
+  print(sl1?.startTime);
+  print(sl1?.endTime);
+  print(sl1?.duration);
+  print(sl1?.efficiency);
+  print('inserted sleep in the DB');
+}
+
+/*Future<bool> AlcolCheck() async {
+
+}*/
+  /*
+  List<Sleepentry> SleepEn = [];
   for (var sleep in sleeps) {
+    print('sleep start time');
+    print(sleep.startTime);
+    print('sleep end time');
+    print(sleep.endTime);
     var sl = Sleepentry(
       sleep.dateOfSleep,
       timeStringToDouble(sleep.startTime),
@@ -372,34 +413,5 @@ void insertSleep(
     );
     SleepEn.add(sl);
   }
-  Provider.of<ProviderSleep>(context, listen: false).insertMultiSleep(SleepEn);
-  print('inserted sleep in the DB');
-}
-//vecchio metodo per inserire i dati nel DB
-/*void insertHeartRates(
-    List<HeartRate> heartRates, BuildContext context, String dateFormatted) {
-  var providerHR = Provider.of<ProviderHR>(
-    context,
-    listen: false,
-  );
-
-  // Questo è il for per inserire tutte le entry di una data
-  for (var heartRate in heartRates) {
-    providerHR.insertHR(HREntity(
-      null,
-      dateFormatted,
-      timeStringToDouble(heartRate.time),
-      heartRate.value,
-    ));
-  }
-
-  //call the function _requestDataSleep
-  _requestDataSleep(context, dateFormatted);
-
-  print(providerHR);
-  //Qui ho messo i dati a mano per fare una singola entry
-  /*var time = timeStringToDouble(heartRates[50].time);
-  var value = heartRates[50].value;
-
-  providerHR.insertHR(HREntity('2023-06-26', time, value));*/
-}*/
+  Provider.of<ProviderSleep>(context, listen: false).insertMultiSleep(SleepEn);*/
+  

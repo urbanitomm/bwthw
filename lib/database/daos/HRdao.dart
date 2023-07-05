@@ -9,6 +9,9 @@ abstract class HRdao {
   @Query('SELECT * FROM HREntity')
   Future<List<HREntity>> findAllHR();
 
+  @Query('SELECT * FROM HREntity WHERE (date = :date)')
+  Future<List<HREntity>> findDateEntry(String date);
+
   //Query #2: SELECT WHERE-> this allows to obtain the value of the HR table
   //from a specific date and after a specific moment in time
   @Query('SELECT value FROM HREntity WHERE (date = :date) AND (time >= :time)')

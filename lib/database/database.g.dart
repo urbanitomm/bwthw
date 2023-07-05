@@ -286,6 +286,14 @@ class _$HRdao extends HRdao {
   }
 
   @override
+  Future<List<HREntity>> findDateEntry(String date) async {
+    return _queryAdapter.queryList('SELECT * FROM HREntity WHERE (date = ?1)',
+        mapper: (Map<String, Object?> row) => HREntity(row['id'] as int?,
+            row['date'] as String, row['time'] as double, row['value'] as int),
+        arguments: [date]);
+  }
+
+  @override
   Future<List<int?>> findEntriesAfter(
     String date,
     double time,
@@ -376,6 +384,18 @@ class _$SleepDao extends SleepDao {
             row['endTime'] as double?,
             row['duration'] as double?,
             row['efficiency'] as int?));
+  }
+
+  @override
+  Future<Sleepentry?> findDateSleep(String date) async {
+    return _queryAdapter.query('SELECT * FROM Sleepentry WHERE (date = ?1)',
+        mapper: (Map<String, Object?> row) => Sleepentry(
+            row['date'] as String?,
+            row['startTime'] as double?,
+            row['endTime'] as double?,
+            row['duration'] as double?,
+            row['efficiency'] as int?),
+        arguments: [date]);
   }
 
   @override
