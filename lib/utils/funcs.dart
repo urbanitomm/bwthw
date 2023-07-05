@@ -37,11 +37,22 @@ double dateTimeToDouble(DateTime dateTime) {
   return dateTime.millisecondsSinceEpoch / 1000;
 }
 
+DateTime doubleToDateTime2(double value) {
+  return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+}
+
+double dateTimeToDouble2(DateTime dateTime) {
+  return dateTime.millisecondsSinceEpoch.toDouble();
+}
+
 double timeStringToDouble(String? timeString) {
   if (timeString == null) {
     return 90000;
   }
-  List<String> components = timeString.split(':');
+  List<String> components1 = timeString.split(' ');
+  String date = components1[0]; // "07-03"
+  String time = components1[1]; // "02:37:00"
+  List<String> components = time.split(':');
   if (components.length != 3) {
     return 0;
   }
