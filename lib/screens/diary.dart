@@ -82,7 +82,7 @@ class _DiaryState extends State<Diary> {
         home: Scaffold(
           appBar: const MyAppbar(),
           drawer: const MyDrawer(),
-          body: Center(
+          body: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

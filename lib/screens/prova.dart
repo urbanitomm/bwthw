@@ -55,6 +55,31 @@ class ProvaState extends State<Prova> {
     print(doubleToString(sl?.endTime));
   }
 
+  //check if the user has drunk alcohol in the last 24 hours
+  //if yes, return true
+  //if no, return false
+  Future<bool?> AlcolCheck(String date) async {
+    DateTime dateTime = DateTime.parse(date);
+    DateTime previousDay = dateTime.subtract(Duration(days: 1));
+
+    String previousDate = previousDay.toString().substring(0, 10);
+    Sleepentry? sleepentry_previous_day =
+        await Provider.of<ProviderSleep>(context, listen: false)
+            .findDateSleep(previousDate);
+    if (sleepentry_previous_day == null ||
+        sleepentry_previous_day.startTime == null ||
+        sleepentry_previous_day.endTime == null) {
+      return null;
+    } else {
+      List<int?> valuesHR1 = await Provider.of<ProviderHR>(context,
+              listen: false)
+          .findEntriesAfter(previousDate, sleepentry_previous_day.startTime!);
+      List<int?> valuesHR2 =
+          await Provider.of<ProviderHR>(context, listen: false)
+              .findEntriesBefore(date, sleepentry_previous_day.endTime!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,32 +106,3 @@ class ProvaState extends State<Prova> {
     );
   }
 }
-//DA aggiungere in data.dart per inserire startTime ed endTime in SleepEntry
-/*List<String> components = (sleeps?.startTime).split(' ');
-  String date = components[0]; // "07-03"
-  String time = components[1]; // "02:37:00"
-  List<String> components1 = date.split('-');
-  int year = 2023;
-  int month = int.tryParse(components1[1]) ?? 0;
-  int day = int.tryParse(components1[2]) ?? 0;
-  List<String> components2 = time.split(':');
-  int hours = int.tryParse(components2[0]) ?? 0;
-  int minutes = int.tryParse(components2[1]) ?? 0;
-  int seconds = int.tryParse(components2[2]) ?? 0;
-  DateTime date1 = DateTime(year, month, day, hours, minutes, seconds);
-  double startTime = dateTimeToDouble2(date1);
-  */
-
-  //DA aggiungere in data.dart per inserire time in heartRate
-  /*
-    int year = 2023;
-    List<String> components3=dateFormatted.split('-');
-    int month = int.tryParse(components3[0]) ?? 0;
-    int day = int.tryParse(components3[1]) ?? 0;
-    List<String> components4=heartRate.time.split(':');
-    int hours = int.tryParse(components4[0]) ?? 0;
-    int minutes = int.tryParse(components4[1]) ?? 0;
-    int seconds = int.tryParse(components4[2]) ?? 0;
-    DateTime date2 = DateTime(year, month, day, hours, minutes, seconds);
-    double time = dateTimeToDouble2(date2);
-  */

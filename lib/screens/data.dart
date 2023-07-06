@@ -42,20 +42,30 @@ class _DataState extends State<Data> {
   final _dateController = TextEditingController();
 
   //...era qui//
-  Future<List<HeartRate>> _dataSourceFuture = Future.value([]);
-  bool _isLoading = false;
   List<HeartRate> heartRates = [];
+  bool _isLoading = false;
+
   Future<void> _loadData() async {
     //final selectedDate = _dateController.text;
     //heartRates = await _dataSourceFuture;
     //heartRates = await _requestDataHR(context, selectedDate);
+
     setState(() {
       _isLoading = true;
     });
     try {
-      final selectedDate = _dateController.text;
+      var selectedDate;
+      if (_dateController.text.isEmpty) {
+        selectedDate = (DateTime.now().subtract(Duration(days: 1))).toString();
+        List<String> date = selectedDate.split(' ');
+        selectedDate = date[0];
+      } else {
+        selectedDate = _dateController.text;
+      }
+      print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
+      print('heartRates: $heartRates');
     } catch (e) {
       // Handle error loading data
       print('Error loading data: $e');
@@ -226,15 +236,12 @@ Future<int> _refreshToken() async {
 }
 
 // This method allows to obtain the HR data from IMPACT
-
-//Future<List<HeartRate>> _requestDataHR() async {
 Future<List<HeartRate>> _requestDataHR(
     BuildContext context, String date) async {
   final result = await _authorize();
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
   List<HeartRate> resultHr = [];
-
   //Get the access token from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString('access');
@@ -286,14 +293,30 @@ Future<List<HeartRate>> _requestDataHR(
 void insertHeartRates(
     List<HeartRate> heartRates, BuildContext context, String dateFormatted) {
   List<HREntity> hrEntities = [];
+  print('dateFormatted');
+  print(dateFormatted); //dateFormatted is in the format yyyy-MM-dd
+
   // Questo è il for per inserire tutte le entry di una data
   for (var heartRate in heartRates) {
+    List cmp0 =
+        dateFormatted.split('-'); //dateFormatted is in the format yyyy-MM-dd
+    int year = int.parse(cmp0[0]);
+    int month = int.parse(cmp0[1]);
+    int day = int.parse(cmp0[2]);
+    List cmp1 =
+        heartRate.time.split(':'); //heartRate.time is in the format hh:mm:ss
+    int hour = int.parse(cmp1[0]);
+    int minute = int.parse(cmp1[1]);
+    int second = int.parse(cmp1[2]);
+    DateTime ddt = DateTime(year, month, day, hour, minute, second);
+    double time = dateTimeToDouble2(ddt);
     var hrEntity = HREntity(
       null,
       dateFormatted,
-      timeStringToDouble(heartRate.time),
+      time,
       heartRate.value,
     );
+
     hrEntities.add(hrEntity);
   }
   Provider.of<ProviderHR>(context, listen: false).insertMultipleHR(hrEntities);
@@ -362,15 +385,22 @@ Future<Sleep?> _requestDataSleep(
 void insertSleep(
     Sleep? sleeps, BuildContext context, String dateFormatted) async {
   var sl;
-
+  print('start time and endtime as they are provided');
+  print(sleeps?.startTime); //eg. 07-04 23:29:00
+  print(sleeps?.endTime);
+  print('start time and endtime converted in DateTime format');
+  print(stringToDateTime(sleeps?.startTime));
+  print(stringToDateTime(sleeps?.endTime));
   sl = Sleepentry(
     dateFormatted,
-    timeStringToDouble(sleeps?.startTime),
-    timeStringToDouble(sleeps?.endTime),
+    dateTimeToDouble2(stringToDateTime(sleeps
+        ?.startTime)), //sleeps?.startTime is in the format MM-gg (hh:mm:ss)
+    dateTimeToDouble2(stringToDateTime(
+        sleeps?.endTime)), //sleeps?.endTime is in the format MM-gg (hh:mm:ss)
     sleeps?.duration,
     sleeps?.efficiency,
   );
-  print('prova1');
+  print('Date of sleep, startTime and endTime as they are provided');
   print(
     sleeps?.dateOfSleep,
   );
@@ -382,6 +412,9 @@ void insertSleep(
   print(sl.endTime);
   print(sl.duration);
   print(sl.efficiency);
+  print('inverse conversion of startTime and endTime from double to dateTime');
+  print(doubleToDateTime2(sl.startTime));
+  print(doubleToDateTime2(sl.endTime));
   Provider.of<ProviderSleep>(context, listen: false).insertSleep(sl);
   Sleepentry? sl1 = await Provider.of<ProviderSleep>(context, listen: false)
       .findDateSleep(sl.date);
@@ -393,25 +426,3 @@ void insertSleep(
   print(sl1?.efficiency);
   print('inserted sleep in the DB');
 }
-
-/*Future<bool> AlcolCheck() async {
-
-}*/
-  /*
-  List<Sleepentry> SleepEn = [];
-  for (var sleep in sleeps) {
-    print('sleep start time');
-    print(sleep.startTime);
-    print('sleep end time');
-    print(sleep.endTime);
-    var sl = Sleepentry(
-      sleep.dateOfSleep,
-      timeStringToDouble(sleep.startTime),
-      timeStringToDouble(sleep.endTime),
-      sleep.duration,
-      sleep.efficiency,
-    );
-    SleepEn.add(sl);
-  }
-  Provider.of<ProviderSleep>(context, listen: false).insertMultiSleep(SleepEn);*/
-  
