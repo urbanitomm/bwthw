@@ -17,6 +17,13 @@ abstract class HRdao {
   @Query('SELECT value FROM HREntity WHERE (date = :date) AND (time >= :time)')
   Future<List<int?>> findEntriesAfter(String date, double time);
 
+  //Query #2: SELECT WHERE-> this allows to obtain the value of the HR table
+  //from a specific date and after a specific moment in time
+  @Query(
+      'SELECT value FROM HREntity WHERE (date = :date) AND (time >= :time1) AND (time <= :time2')
+  Future<List<int?>> findEntriesBetween(
+      String date, double time1, double time2);
+
   //Query #3: SELECT WHERE-> this allows to obtain the value of the HR table
   //from a specific date and before a specific moment in time
   @Query('SELECT value FROM HREntity WHERE (date = :date) AND (time <= :time)')

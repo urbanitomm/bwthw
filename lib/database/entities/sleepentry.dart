@@ -12,7 +12,7 @@ class Sleepentry {
 
   final double? duration;
 
-  final int? efficiency;
+  final double? efficiency;
 
   //Default constructor
   Sleepentry(

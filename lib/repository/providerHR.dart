@@ -27,6 +27,13 @@ class ProviderHR extends ChangeNotifier {
     return results;
   } //findEntriesWhere
 
+  //This method wraps the findEntriesBetween() method of the DAO
+  Future<List<int?>> findEntriesBetween(
+      String date, double time1, double time2) async {
+    final results = await database.hRdao.findEntriesBetween(date, time1, time2);
+    return results;
+  }
+
   //This method wraps the howManyEntries() method of the DAO
   Future<List<int?>> findEntriesBefore(String date, double time) async {
     final results = await database.hRdao.findEntriesBefore(date, time);

@@ -21,7 +21,6 @@ import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:progetto_wearable/repository/providerHR.dart';
 import 'package:progetto_wearable/repository/providerSleep.dart';
 import 'package:progetto_wearable/database/entities/sleepentry.dart';
-import 'package:progetto_wearable/utils/funcs.dart';
 
 class Data extends StatefulWidget {
   static const route = '/data/';
@@ -40,7 +39,7 @@ class _DataState extends State<Data> {
   ];
 
   final _dateController = TextEditingController();
-
+  String string_result_alcol_check = '';
   //...era qui//
   List<HeartRate> heartRates = [];
   bool _isLoading = false;
@@ -53,10 +52,12 @@ class _DataState extends State<Data> {
     setState(() {
       _isLoading = true;
     });
+
     try {
       var selectedDate;
       if (_dateController.text.isEmpty) {
         selectedDate = (DateTime.now().subtract(Duration(days: 1))).toString();
+
         List<String> date = selectedDate.split(' ');
         selectedDate = date[0];
       } else {
@@ -65,9 +66,23 @@ class _DataState extends State<Data> {
       print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
-      print('heartRates: $heartRates');
+      bool? result_alcol_check = await AlcolCheck(selectedDate, context);
+      if (result_alcol_check == null) {
+        setState(() {
+          string_result_alcol_check = 'No data available';
+        });
+      } else if (result_alcol_check == true) {
+        setState(() {
+          string_result_alcol_check =
+              'We suppose you have consumed alcohol yesterday';
+        });
+      } else {
+        setState(() {
+          string_result_alcol_check =
+              'We suppose you have not consumed alcohol yesterday';
+        });
+      }
     } catch (e) {
-      // Handle error loading data
       print('Error loading data: $e');
     } finally {
       setState(() {
@@ -166,10 +181,21 @@ class _DataState extends State<Data> {
                 )),
           ),
         ),
+        Container(
+          padding: const EdgeInsets.all(10),
+          color: Color.fromARGB(255, 129, 7, 143),
+          child: Text(
+            string_result_alcol_check,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+        )
       ],
     ));
   }
-}
+} //string_result_alcol_check
 
 // This method allows to obtain the JWT token pair from IMPACT and store it in SharedPreferences
 Future<int?> _authorize() async {
@@ -285,13 +311,14 @@ Future<List<HeartRate>> _requestDataHR(
     print(response.statusCode);
   }
 
-  insertHeartRates(resultHr, context, date);
+  await insertHeartRates(resultHr, context, date);
+
   print('finished with DB');
   return resultHr;
 }
 
-void insertHeartRates(
-    List<HeartRate> heartRates, BuildContext context, String dateFormatted) {
+Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
+    String dateFormatted) async {
   List<HREntity> hrEntities = [];
   print('dateFormatted');
   print(dateFormatted); //dateFormatted is in the format yyyy-MM-dd
@@ -322,7 +349,7 @@ void insertHeartRates(
   Provider.of<ProviderHR>(context, listen: false).insertMultipleHR(hrEntities);
   print('inserted HR in the DB');
   //call the function _requestDataSleep
-  _requestDataSleep(context, dateFormatted);
+  await _requestDataSleep(context, dateFormatted);
 }
 
 // This method allows to obtain the Sleep data from IMPACT
@@ -377,12 +404,16 @@ Future<Sleep?> _requestDataSleep(
     print('error' + response.statusCode.toString());
   }
 
-  insertSleep(resultSleep, context, dateFormatted);
+  await insertSleep(resultSleep, context, dateFormatted);
+  var prev_date = DateTime.parse(dateFormatted);
+  prev_date = prev_date.subtract(Duration(days: 1));
+  var prev_date_formatted = dateToString(prev_date);
+  await insertSleep(resultSleep, context, prev_date_formatted);
 
   return resultSleep;
 }
 
-void insertSleep(
+Future<void> insertSleep(
     Sleep? sleeps, BuildContext context, String dateFormatted) async {
   var sl;
   print('start time and endtime as they are provided');
@@ -398,7 +429,7 @@ void insertSleep(
     dateTimeToDouble2(stringToDateTime(
         sleeps?.endTime)), //sleeps?.endTime is in the format MM-gg (hh:mm:ss)
     sleeps?.duration,
-    sleeps?.efficiency,
+    sleeps?.efficiency.toDouble(),
   );
   print('Date of sleep, startTime and endTime as they are provided');
   print(
@@ -425,4 +456,118 @@ void insertSleep(
   print(sl1?.duration);
   print(sl1?.efficiency);
   print('inserted sleep in the DB');
+}
+
+Future<bool?> AlcolCheck(String date, BuildContext context) async {
+  DateTime dateTime = DateTime.parse(date);
+  //previous day
+  DateTime previousDay = dateTime.subtract(Duration(days: 1));
+  String previousDate = previousDay.toString().substring(0, 10);
+
+  Sleepentry? sleepentry_current_day =
+      await Provider.of<ProviderSleep>(context, listen: false)
+          .findDateSleep(previousDate);
+  bool efficiency_param;
+  bool sleep_time_param;
+  bool HR_param;
+  if (sleepentry_current_day == null ||
+      sleepentry_current_day.startTime == null ||
+      sleepentry_current_day.endTime == null ||
+      sleepentry_current_day.duration == null ||
+      sleepentry_current_day.efficiency == null) {
+    return null;
+  } else {
+    DateTime midnight =
+        DateTime(dateTime.year, dateTime.month, dateTime.day, 0, 0, 0);
+    if (doubleToDateTime2(sleepentry_current_day.startTime!)
+        .isAfter(midnight)) {
+      List<int?> valuesHR =
+          await Provider.of<ProviderHR>(context, listen: false)
+              .findEntriesBetween(date, sleepentry_current_day.startTime!,
+                  sleepentry_current_day.endTime!);
+      double meanHR = meanValue(valuesHR);
+      double placebo_HR = (meanHR - 56.4).abs();
+      double Alcohol_HR = (meanHR - 65).abs();
+
+      if (placebo_HR < Alcohol_HR) {
+        HR_param =
+            false; //the nocturnal HR is closer to the mean HR of the placebo group
+      } else {
+        HR_param =
+            true; //the nocturnal HR is closer to the mean HR of the alcohol group
+      }
+
+      double placebo_duration =
+          (sleepentry_current_day.duration! - 436.6).abs();
+      double Alcohol_duration =
+          (sleepentry_current_day.duration! - 421.3).abs();
+      if (placebo_duration < Alcohol_duration) {
+        sleep_time_param = false;
+      } else {
+        sleep_time_param = true;
+      }
+
+      double placebo_efficiency =
+          (sleepentry_current_day.efficiency! - 91.2).abs();
+      double Alcohol_efficiency =
+          (sleepentry_current_day.efficiency! - 88.0).abs();
+      if (placebo_efficiency < Alcohol_efficiency) {
+        efficiency_param = false;
+      } else {
+        efficiency_param = true;
+      }
+    } else {
+      List<int?> valuesHR_after_startTime =
+          await Provider.of<ProviderHR>(context, listen: false)
+              .findEntriesAfter(date, sleepentry_current_day.startTime!);
+      List<int?> valuesHR_before_endTime =
+          await Provider.of<ProviderHR>(context, listen: false)
+              .findEntriesBefore(previousDate, sleepentry_current_day.endTime!);
+      List<int?> valuesHR = [];
+      valuesHR.addAll(valuesHR_after_startTime);
+      valuesHR.addAll(valuesHR_before_endTime);
+      double meanHR = meanValue(valuesHR);
+      double placebo_HR = (meanHR - 56.4).abs();
+      double Alcohol_HR = (meanHR - 65).abs();
+
+      if (placebo_HR < Alcohol_HR) {
+        HR_param =
+            false; //the nocturnal HR is closer to the mean HR of the placebo group
+      } else {
+        HR_param =
+            true; //the nocturnal HR is closer to the mean HR of the alcohol group
+      }
+
+      double placebo_duration =
+          (sleepentry_current_day.duration! - 436.6).abs();
+      double Alcohol_duration =
+          (sleepentry_current_day.duration! - 421.3).abs();
+      if (placebo_duration < Alcohol_duration) {
+        sleep_time_param = false;
+      } else {
+        sleep_time_param = true;
+      }
+
+      double placebo_efficiency =
+          (sleepentry_current_day.efficiency! - 91.2).abs();
+      double Alcohol_efficiency =
+          (sleepentry_current_day.efficiency! - 88.0).abs();
+      if (placebo_efficiency < Alcohol_efficiency) {
+        efficiency_param = false;
+      } else {
+        efficiency_param = true;
+      }
+    }
+    return (HR_param && sleep_time_param) ||
+        (HR_param && efficiency_param) ||
+        (efficiency_param && sleep_time_param);
+  }
+}
+
+double meanValue(List<int?> valuesHR) {
+  int sum = 0;
+  for (int i = 0; i < valuesHR.length; i++) {
+    sum += valuesHR[i]!;
+  }
+  return sum / valuesHR.length;
 }

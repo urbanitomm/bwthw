@@ -97,7 +97,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `HREntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` TEXT NOT NULL, `time` REAL NOT NULL, `value` INTEGER NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Sleepentry` (`date` TEXT, `startTime` REAL, `endTime` REAL, `duration` REAL, `efficiency` INTEGER, PRIMARY KEY (`date`))');
+            'CREATE TABLE IF NOT EXISTS `Sleepentry` (`date` TEXT, `startTime` REAL, `endTime` REAL, `duration` REAL, `efficiency` REAL, PRIMARY KEY (`date`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -305,6 +305,18 @@ class _$HRdao extends HRdao {
   }
 
   @override
+  Future<List<int?>> findEntriesBetween(
+    String date,
+    double time1,
+    double time2,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT value FROM HREntity WHERE (date = ?1) AND (time >= ?2) AND (time <= ?3',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [date, time1, time2]);
+  }
+
+  @override
   Future<List<int?>> findEntriesBefore(
     String date,
     double time,
@@ -383,7 +395,7 @@ class _$SleepDao extends SleepDao {
             row['startTime'] as double?,
             row['endTime'] as double?,
             row['duration'] as double?,
-            row['efficiency'] as int?));
+            row['efficiency'] as double?));
   }
 
   @override
@@ -394,7 +406,7 @@ class _$SleepDao extends SleepDao {
             row['startTime'] as double?,
             row['endTime'] as double?,
             row['duration'] as double?,
-            row['efficiency'] as int?),
+            row['efficiency'] as double?),
         arguments: [date]);
   }
 
