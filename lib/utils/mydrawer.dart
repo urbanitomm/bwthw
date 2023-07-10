@@ -9,81 +9,95 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.yellow,
-            ),
-            child: Stack(
-              children: [
-                UserAccountsDrawerHeader(
-                  accountName: Text("Luca"),
-                  accountEmail: Text("luca@virgilio.it"),
-                  //TODO: aggiungere foto profilo
-                  currentAccountPicture: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    //backgroundImage: NetworkImage(
-                    //"https://appmaking.co/wp-content/uploads/2021/08/appmaking-logo-colored.png"),
-                  ),
-                )
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.account_box,
-              color: Color.fromARGB(255, 129, 7, 143),
-              size: 45,
-            ),
-            title: const Text("PROFILE", style: TextStyle(fontSize: 17)),
-            selectedColor: Colors.yellow,
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Profile()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.settings,
-              color: Color.fromARGB(255, 129, 7, 143),
-              size: 50,
-            ),
-            title: const Text("OPTIONS", style: TextStyle(fontSize: 17)),
-            selectedColor: Colors.yellow,
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Options()));
-            },
-          ),
-          ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: Color.fromARGB(255, 129, 7, 143),
-                size: 50,
+    return FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Drawer(child: SizedBox());
+        }
+
+        final sp = snapshot.data!;
+        final name = sp.getString('name') ?? '';
+        final surname = sp.getString('surname') ?? '';
+        final email = sp.getString('email') ?? '';
+
+        return Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.yellow,
+                ),
+                child: Stack(
+                  children: [
+                    UserAccountsDrawerHeader(
+                      accountName: Text('$name $surname'),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        backgroundImage: AssetImage('assets/images/img.jpg'),
+                      ),
+                    )
+                  ],
+                ),
               ),
-              title: const Text("LOGOUT", style: TextStyle(fontSize: 17)),
-              selectedColor: Colors.yellow,
-              onTap: () async {
-                //Logging out the shared preferences for the profile are deleted
-                SharedPreferences sp = await SharedPreferences.getInstance();
-                await sp.remove("username");
-                print('SP cleaned');
-                _toLoginPage(context);
-              }),
-        ],
-      ),
+              ListTile(
+                leading: const Icon(
+                  Icons.account_box,
+                  color: Color.fromARGB(255, 129, 7, 143),
+                  size: 45,
+                ),
+                title: const Text("PROFILE", style: TextStyle(fontSize: 17)),
+                selectedColor: Colors.yellow,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const Profile()));
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.settings,
+                  color: Color.fromARGB(255, 129, 7, 143),
+                  size: 50,
+                ),
+                title: const Text("OPTIONS", style: TextStyle(fontSize: 17)),
+                selectedColor: Colors.yellow,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const Options()));
+                },
+              ),
+              ListTile(
+                  leading: const Icon(
+                    Icons.logout,
+                    color: Color.fromARGB(255, 129, 7, 143),
+                    size: 50,
+                  ),
+                  title: const Text("LOGOUT", style: TextStyle(fontSize: 17)),
+                  selectedColor: Colors.yellow,
+                  onTap: () async {
+                    //Logging out the shared preferences for the profile are deleted
+                    SharedPreferences sp =
+                        await SharedPreferences.getInstance();
+                    await sp.remove("username");
+                    print('SP cleaned');
+                    _toLoginPage(context);
+                  }),
+            ],
+          ),
+        );
+      },
     );
   }
-
-  void _toLoginPage(BuildContext context) async {
-    //Unset the 'username' filed in SharedPreference
-    final sp = await SharedPreferences.getInstance();
-    sp.remove('username');
-
-    //Then pop the HomePage
-    Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => const Login()), (route) => false);
-  } //_toCalendarPage
 }
+
+void _toLoginPage(BuildContext context) async {
+  //Unset the 'username' filed in SharedPreference
+  final sp = await SharedPreferences.getInstance();
+  sp.remove('username');
+
+  //Then pop the HomePage
+  Navigator.pushAndRemoveUntil(context,
+      MaterialPageRoute(builder: (_) => const Login()), (route) => false);
+} //_toCalendarPage
+//}

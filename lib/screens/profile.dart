@@ -18,6 +18,10 @@ class _ProfileState extends State<Profile> {
   String name = '';
   String surname = '';
   String email = '';
+  TextEditingController nameController =
+      TextEditingController(); // Define the nameController variable
+  TextEditingController surnameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
 
   @override
   void initState() {
@@ -32,7 +36,17 @@ class _ProfileState extends State<Profile> {
       name = sp.getString('name') ?? 'Giacomo';
       surname = sp.getString('surname') ?? 'Cappon';
       email = sp.getString('email') ?? '1234@567.com';
+      nameController.text = name;
+      surnameController.text = surname;
+      emailController.text = email;
     });
+  }
+
+  Future<void> savePref() async {
+    final sp = await SharedPreferences.getInstance();
+    sp.setString('name', name);
+    sp.setString('surname', surname);
+    sp.setString('email', email);
   }
 
   @override
@@ -59,45 +73,85 @@ class _ProfileState extends State<Profile> {
               ),
             ),
       home: Scaffold(
-          appBar: const MyAppbar(),
-          drawer: const MyDrawer(),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Homepage()));
-            },
-            child: const Icon(Icons.arrow_back),
-          ),
-          body: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.4,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/img.jpg'),
-                      fit: BoxFit.cover),
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        appBar: const MyAppbar(),
+        drawer: const MyDrawer(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Homepage()));
+          },
+          child: const Icon(Icons.arrow_back),
+        ),
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            SingleChildScrollView(
+              child: Column(
                 children: [
-                  const SizedBox(height: 16),
-                  Text(
-                    '$name $surname',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                  Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: AssetImage('assets/images/img.jpg'),
+                          fit: BoxFit.cover),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  ListTile(
-                    leading: const Icon(Icons.email),
-                    title: Text(email),
-                  )
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: nameController,
+                        onChanged: (value) {
+                          setState(() {
+                            name = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: surnameController,
+                        onChanged: (value) {
+                          setState(() {
+                            surname = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Surname',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: emailController,
+                        onChanged: (value) {
+                          setState(() {
+                            email = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          savePref();
+                        },
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          )),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
