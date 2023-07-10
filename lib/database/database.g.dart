@@ -234,7 +234,7 @@ class _$ReportDao extends ReportDao {
 
   @override
   Future<void> insertReport(Report report) async {
-    await _reportInsertionAdapter.insert(report, OnConflictStrategy.abort);
+    await _reportInsertionAdapter.insert(report, OnConflictStrategy.replace);
   }
 
   @override

@@ -10,7 +10,7 @@ abstract class ReportDao {
   Future<List<Report>> findAllReports();
 
   //Query #2: INSERT -> this allows to add a Report in the table
-  @insert
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertReport(Report report);
 
   //Query #3: DELETE -> this allows to delete a Report from the table
