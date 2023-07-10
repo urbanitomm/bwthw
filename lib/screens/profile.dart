@@ -1,8 +1,12 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -14,12 +18,13 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  //File? _profilePicture;
+  File? profilePicture;
   bool isDarkModeEnabled = false; //default value
   String name = '';
   String surname = '';
   String email = '';
-  TextEditingController nameController =
-      TextEditingController(); // Define the nameController variable
+  TextEditingController nameController = TextEditingController();
   TextEditingController surnameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
@@ -39,6 +44,15 @@ class _ProfileState extends State<Profile> {
       nameController.text = name;
       surnameController.text = surname;
       emailController.text = email;
+      final profilePicturePath = sp.getString('profilePicture');
+      /*if (base64Image != null) {
+        final bytes = base64Decode(base64Image);
+        _profilePicture = File.fromRawPath(bytes);
+      }*/
+      if (profilePicturePath != null) {
+        profilePicture =
+            File(profilePicturePath.replaceFirst('/', Platform.pathSeparator));
+      }
     });
   }
 
@@ -47,6 +61,18 @@ class _ProfileState extends State<Profile> {
     sp.setString('name', name);
     sp.setString('surname', surname);
     sp.setString('email', email);
+    if (profilePicture != null) {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/profile_picture.jpg');
+      await file.writeAsBytes(await profilePicture!.readAsBytes());
+      sp.setString('profilePicture', file.path);
+    }
+  }
+
+  Future<XFile?> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    return pickedFile;
   }
 
   @override
@@ -74,7 +100,7 @@ class _ProfileState extends State<Profile> {
             ),
       home: Scaffold(
         appBar: const MyAppbar(),
-        drawer: const MyDrawer(),
+        drawer: MyDrawer(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(context,
@@ -88,14 +114,28 @@ class _ProfileState extends State<Profile> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/img.jpg'),
-                          fit: BoxFit.cover),
+                  GestureDetector(
+                    onTap: () async {
+                      final pickedFile = await pickImage();
+                      if (pickedFile != null) {
+                        setState(() {
+                          profilePicture = File(pickedFile.path);
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: profilePicture != null
+                            ? DecorationImage(
+                                image: FileImage(profilePicture!),
+                                fit: BoxFit.cover)
+                            : DecorationImage(
+                                image: AssetImage('assets/images/img.jpg'),
+                                fit: BoxFit.cover),
+                      ),
                     ),
                   ),
                   Column(

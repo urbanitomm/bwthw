@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:progetto_wearable/screens/profile.dart';
 import 'package:progetto_wearable/screens/login.dart';
@@ -5,7 +7,7 @@ import 'package:progetto_wearable/screens/Options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  const MyDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +19,12 @@ class MyDrawer extends StatelessWidget {
         }
 
         final sp = snapshot.data!;
-        final name = sp.getString('name') ?? '';
-        final surname = sp.getString('surname') ?? '';
-        final email = sp.getString('email') ?? '';
+        final name = sp.getString('name') ?? 'Giacomo';
+        final surname = sp.getString('surname') ?? 'Cappon';
+        final email = sp.getString('email') ?? '1234@5678.com';
+        final profilePicturePath = sp.getString('profilePicture');
+        final profilePicture =
+            profilePicturePath != null ? File(profilePicturePath) : null;
 
         return Drawer(
           child: ListView(
@@ -35,7 +40,10 @@ class MyDrawer extends StatelessWidget {
                       accountEmail: Text(email),
                       currentAccountPicture: CircleAvatar(
                         backgroundColor: Colors.white,
-                        backgroundImage: AssetImage('assets/images/img.jpg'),
+                        backgroundImage: profilePicture != null
+                            ? FileImage(profilePicture)
+                                as ImageProvider<Object>?
+                            : const AssetImage('assets/images/img.jpg'),
                       ),
                     )
                   ],
