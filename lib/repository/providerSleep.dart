@@ -40,9 +40,37 @@ class ProviderSleep extends ChangeNotifier {
     return results;
   }
 
+  //This method wraps the findWeekDuration() method of the DAO
+  Future<List<double?>?> findWeekDuration(
+      String date1,
+      String date2,
+      String date3,
+      String date4,
+      String date5,
+      String date6,
+      String date7) async {
+    final results = await database.sleepDao
+        .findWeekDuration(date1, date2, date3, date4, date5, date6, date7);
+    return results;
+  }
+
   //This method wraps the findEfficiency() method of the DAO
   Future<double?> findEfficiency(String date) async {
     final results = await database.sleepDao.findEfficiency(date);
+    return results;
+  }
+
+  //This method wraps the findWeekEfficiency() method of the DAO
+  Future<List<double?>?> findWeekEfficiency(
+      String date1,
+      String date2,
+      String date3,
+      String date4,
+      String date5,
+      String date6,
+      String date7) async {
+    final results = await database.sleepDao
+        .findWeekDuration(date1, date2, date3, date4, date5, date6, date7);
     return results;
   }
 
