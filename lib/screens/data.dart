@@ -42,6 +42,7 @@ class _DataState extends State<Data> {
   String string_result_alcol_check = '';
   //...era qui//
   List<HeartRate> heartRates = [];
+  List<HeartRate> heartRates_prev_day = [];
   bool _isLoading = false;
 
   Future<void> _loadData() async {
@@ -66,6 +67,17 @@ class _DataState extends State<Data> {
       print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
+      var prev_date = DateTime.parse(selectedDate);
+      prev_date = prev_date.subtract(Duration(days: 1));
+      var prev_date_formatted = dateToString(prev_date);
+      heartRates_prev_day = await _requestDataHR(context, prev_date_formatted);
+      //I retrieve data from both current day and previous day since sometimes it's necessary to have HR data from the startaime to midnight
+      await insertHeartRates(heartRates, context, selectedDate);
+      await insertHeartRates(heartRates_prev_day, context, prev_date_formatted);
+
+      Sleep? requ_sleep = await _requestDataSleep(context, selectedDate);
+      await insertSleep(requ_sleep, context, selectedDate);
+
       bool? result_alcol_check = await AlcolCheck(selectedDate, context);
       if (result_alcol_check == null) {
         setState(() {
@@ -93,7 +105,6 @@ class _DataState extends State<Data> {
 
   @override
   void initState() {
-    //_dataSourceFuture = _requestDataHR(context, _dateController.text);
     super.initState();
     _loadData();
   }
@@ -310,9 +321,6 @@ Future<List<HeartRate>> _requestDataHR(
   } else {
     print(response.statusCode);
   }
-
-  await insertHeartRates(resultHr, context, date);
-
   print('finished with DB');
   return resultHr;
 }
@@ -343,13 +351,13 @@ Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
       time,
       heartRate.value,
     );
-
+    print('------------HR ENTITY FROM INSERT HEART RATES-----------------');
+    print(hrEntity);
+    print('------------END HR ENTITY FROM INSERT HEART RATES-----------------');
     hrEntities.add(hrEntity);
   }
   Provider.of<ProviderHR>(context, listen: false).insertMultipleHR(hrEntities);
   print('inserted HR in the DB');
-  //call the function _requestDataSleep
-  await _requestDataSleep(context, dateFormatted);
 }
 
 // This method allows to obtain the Sleep data from IMPACT
@@ -359,7 +367,6 @@ Future<Sleep?> _requestDataSleep(
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
   Sleep? resultSleep = null;
-
   //Get the access token from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString('access');
@@ -388,35 +395,63 @@ Future<Sleep?> _requestDataSleep(
     headers: headers,
   );
 
-  print(response.statusCode);
+  print(response.statusCode); //statusCode is int type
 
-  //Check response
-
+  print((response.body));
   if (response.statusCode == 200) {
-    final decodedResponse = jsonDecode(response.body);
+    // Parse the JSON response
 
-    for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
-      resultSleep = (Sleep.fromJson(decodedResponse['data']['data'][i]));
-      print('sleep');
-      print(resultSleep);
+    Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+    Map<String, dynamic> data = decodedResponse['data'];
+
+    if (data.isEmpty) {
+      print('data is empty');
+
+      resultSleep = null;
+    } else {
+      Map<String, dynamic> sleepData = data['data'][0];
+//result of the extratcted data from the server
+      print(
+          '---------------------------------------------DATA FROM REQUEST_DATA_SLEEP---------------------------------------------------');
+      print(sleepData['dateOfSleep']); //dateOfSleep is in the format MM-dd
+      print(sleepData['startTime']); //startTime is in the format MM-dd hh:mm:ss
+      print(sleepData['endTime']); //endTime is in the format MM-dd hh:mm:ss
+      print(sleepData['duration']); //duration is in ms
+      print(sleepData['efficiency']); //efficiency is in %
+      print(
+          '---------------------------------------------END DATA FROM REQUEST_DATA_SLEEP---------------------------------------------------');
+      String dateOfSleep = sleepData['dateOfSleep'].toString();
+      String startTime = sleepData['startTime'].toString();
+      String endTime = sleepData['endTime'].toString();
+      double duration = (sleepData['duration'] as num?)?.toDouble() ?? 0.0;
+      double efficiency = (sleepData['efficiency'] as num?)?.toDouble() ?? 0.0;
+
+      resultSleep = Sleep.fromJson({
+        'dateOfSleep': dateOfSleep,
+        'startTime': startTime,
+        'endTime': endTime,
+        'duration': duration,
+        'efficiency': efficiency,
+      });
     }
+    return resultSleep;
   } else {
-    print('error' + response.statusCode.toString());
+    //if the response is not 200
+    print(response.statusCode);
+    return null;
   }
-
-  await insertSleep(resultSleep, context, dateFormatted);
-  var prev_date = DateTime.parse(dateFormatted);
-  prev_date = prev_date.subtract(Duration(days: 1));
-  var prev_date_formatted = dateToString(prev_date);
-  await insertSleep(resultSleep, context, prev_date_formatted);
-
-  return resultSleep;
 }
 
 Future<void> insertSleep(
     Sleep? sleeps, BuildContext context, String dateFormatted) async {
   var sl;
-  print('start time and endtime as they are provided');
+  print(
+      '---------------------------DATA FROM INSERT SLEEP---------------------------');
+  print('input data from the Sleep? data type');
+  print('Date of sleep, start time and endtime as they are provided');
+  print(
+    sleeps?.dateOfSleep,
+  ); //eg. 07-14
   print(sleeps?.startTime); //eg. 07-04 23:29:00
   print(sleeps?.endTime);
   print('start time and endtime converted in DateTime format');
@@ -429,14 +464,9 @@ Future<void> insertSleep(
     dateTimeToDouble2(stringToDateTime(
         sleeps?.endTime)), //sleeps?.endTime is in the format MM-gg (hh:mm:ss)
     sleeps?.duration,
-    sleeps?.efficiency.toDouble(),
+    sleeps?.efficiency,
   );
-  print('Date of sleep, startTime and endTime as they are provided');
-  print(
-    sleeps?.dateOfSleep,
-  );
-  print(sleeps?.startTime);
-  print(sleeps?.endTime);
+
   print('sleep Entry is');
   print(sl.date);
   print(sl.startTime);
@@ -456,6 +486,8 @@ Future<void> insertSleep(
   print(sl1?.duration);
   print(sl1?.efficiency);
   print('inserted sleep in the DB');
+  print(
+      '------------------------------------------end of insertSleep function----------------------------------------------------------------');
 }
 
 Future<bool?> AlcolCheck(String date, BuildContext context) async {
