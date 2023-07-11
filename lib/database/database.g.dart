@@ -435,43 +435,11 @@ class _$SleepDao extends SleepDao {
   }
 
   @override
-  Future<List<double?>?> findWeekDuration(
-    String date1,
-    String date2,
-    String date3,
-    String date4,
-    String date5,
-    String date6,
-    String date7,
-  ) async {
-    return _queryAdapter.queryList(
-        'SELECT duration FROM Sleepentry WHERE (date = ?1) OR (date = ?2) OR (date = ?3) OR (date = ?4) OR (date = ?5) OR (date = ?6) OR (date = ?7',
-        mapper: (Map<String, Object?> row) => row.values.first as double,
-        arguments: [date1, date2, date3, date4, date5, date6, date7]);
-  }
-
-  @override
   Future<double?> findEfficiency(String date) async {
     return _queryAdapter.query(
         'SELECT efficiency FROM Sleepentry WHERE (date = ?1)',
         mapper: (Map<String, Object?> row) => row.values.first as double,
         arguments: [date]);
-  }
-
-  @override
-  Future<List<double?>?> findWeekEfficiency(
-    String date1,
-    String date2,
-    String date3,
-    String date4,
-    String date5,
-    String date6,
-    String date7,
-  ) async {
-    return _queryAdapter.queryList(
-        'SELECT duration FROM Sleepentry WHERE (date = ?1) OR (date = ?2) OR (date = ?3) OR (date = ?4) OR (date = ?5) OR (date = ?6) OR (date = ?7',
-        mapper: (Map<String, Object?> row) => row.values.first as double,
-        arguments: [date1, date2, date3, date4, date5, date6, date7]);
   }
 
   @override
