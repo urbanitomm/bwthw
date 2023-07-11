@@ -5,6 +5,7 @@ import 'package:progetto_wearable/screens/profile.dart';
 import 'package:progetto_wearable/screens/login.dart';
 import 'package:progetto_wearable/screens/Options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:progetto_wearable/screens/map.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
@@ -91,6 +92,19 @@ class MyDrawer extends StatelessWidget {
                     print('SP cleaned');
                     _toLoginPage(context);
                   }),
+              ListTile(
+                leading: const Icon(
+                  Icons.settings,
+                  color: Color.fromARGB(255, 129, 7, 143),
+                  size: 50,
+                ),
+                title: const Text("MAPS", style: TextStyle(fontSize: 17)),
+                selectedColor: Colors.yellow,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MapView()));
+                },
+              ),
             ],
           ),
         );
