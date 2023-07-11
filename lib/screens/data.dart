@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+//import 'dart:js';
 //import 'dart:js_util';
 //import 'dart:js' as js;
 
@@ -8,6 +9,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:progetto_wearable/database/entities/HRentity.dart';
 import 'package:progetto_wearable/models/hr.dart';
 //import 'package:progetto_wearable/models/restingHr.dart';
@@ -42,6 +44,8 @@ class _DataState extends State<Data> {
   String string_result_alcol_check = '';
   //...era qui//
   List<HeartRate> heartRates = [];
+  List<Map<String, double?>> effWeek = [];
+
   bool _isLoading = false;
 
   Future<void> _loadData() async {
@@ -66,6 +70,8 @@ class _DataState extends State<Data> {
       print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
+      effWeek = await efficiencyWeek(context, selectedDate);
+      print('effWeek: $effWeek');
       bool? result_alcol_check = await AlcolCheck(selectedDate, context);
       if (result_alcol_check == null) {
         setState(() {
@@ -104,6 +110,7 @@ class _DataState extends State<Data> {
     return SingleChildScrollView(
         child: Column(
       children: [
+        // DATE SELECTION
         TextField(
           controller: _dateController,
           readOnly: true,
@@ -128,17 +135,30 @@ class _DataState extends State<Data> {
           ),
         ),
         if (_isLoading) CircularProgressIndicator(),
+        // SPACING
         SizedBox(
-          height:
-              10, // Set the height of the SizedBox widget to a smaller value
+          height: 50,
+          child: Center(
+            child: Text(
+              _dateController.text.isEmpty
+                  ? 'Heart rate of yesterday'
+                  : 'Heart rate of ${_dateController.text}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ), // Set the height of the SizedBox widget to a smaller value
         ),
+        // ALCOHOL Graph
         SizedBox(
           height: 550,
           child: LineChart(
             LineChartData(
                 minX: 0,
                 minY: 0,
-                maxY: 160,
+                maxY: 200,
                 gridData: FlGridData(
                   show: true,
                   getDrawingHorizontalLine: (value) {
@@ -181,6 +201,89 @@ class _DataState extends State<Data> {
                 )),
           ),
         ),
+        // SPACING
+        SizedBox(
+          height:
+              50, // Set the height of the SizedBox widget to a smaller value
+          // add a text in the vertical center
+
+          child: Center(
+            child: Text(
+              'Sleep effinciency in the last week',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        SizedBox(
+            height: 300,
+            child: BarChart(
+              BarChartData(
+                  maxY: 100,
+                  borderData: FlBorderData(
+                      border: const Border(
+                    top: BorderSide.none,
+                    right: BorderSide(color: Colors.blue, width: 1),
+                    left: BorderSide(color: Colors.blue, width: 1),
+                    bottom: BorderSide(color: Colors.blue, width: 1),
+                  )),
+                  groupsSpace: 10,
+                  barGroups: [
+                    BarChartGroupData(x: 0, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[0]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                    BarChartGroupData(x: 1, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[1]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                    BarChartGroupData(x: 2, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[2]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                    BarChartGroupData(x: 3, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[3]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                    BarChartGroupData(x: 4, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[4]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                    BarChartGroupData(x: 5, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[5]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                    BarChartGroupData(x: 6, barRods: [
+                      BarChartRodData(
+                        toY: effWeek[6]['efficiency'] ?? 0,
+                        color: Colors.blue,
+                        width: 20,
+                      ),
+                    ]),
+                  ]),
+            )),
+
         Container(
           padding: const EdgeInsets.all(10),
           color: Color.fromARGB(255, 129, 7, 143),
@@ -570,4 +673,58 @@ double meanValue(List<int?> valuesHR) {
     sum += valuesHR[i]!;
   }
   return sum / valuesHR.length;
+}
+
+/* PROVA CON UNA SOLA QUERY
+
+Future<List<Map<String, double?>>> efficiencyWeek(
+    BuildContext context, String selectedDate) async {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateTime selectedDateTime = formatter.parse(selectedDate);
+  final List<Map<String, double?>> efficiencyWeek = [];
+  List<String> dates = [];
+  print('EFF WEEK selected date is $selectedDate');
+  for (int i = 0; i < 7; i++) {
+    DateTime date = selectedDateTime.subtract(Duration(days: i));
+    dates.add(formatter.format(date));
+  }
+  print('EFF WEEK dates are $dates');
+
+  final List<double?>? efficiency = await Provider.of<ProviderSleep>(context,
+          listen: false)
+      .findWeekEfficiency(
+          dates[0], dates[1], dates[2], dates[3], dates[4], dates[5], dates[6]);
+
+  for (int i = 0; i < efficiency!.length; i++) {
+    Map<String, double?> data = {
+      'date': i.toDouble(),
+      'efficiency': efficiency[i],
+    };
+    efficiencyWeek.add(data);
+  }
+
+  return efficiencyWeek;
+}*/
+
+// PROVA CON 7 QUERY
+
+Future<List<Map<String, double?>>> efficiencyWeek(
+    BuildContext context, String selectedDate) async {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateTime selectedDateTime = formatter.parse(selectedDate);
+  final List<Map<String, double?>> efficiencyWeek = [];
+  List<String> dates = [];
+  for (int i = 0; i < 7; i++) {
+    DateTime date = selectedDateTime.subtract(Duration(days: i));
+    dates.add(formatter.format(date));
+  }
+  for (int i = 0; i < dates.length; i++) {
+    final double? efficiency =
+        await Provider.of<ProviderSleep>(context, listen: false)
+            .findEfficiency(dates[i]);
+    efficiencyWeek.add({'date': i.toDouble(), 'efficiency': efficiency});
+    print('Date: ${dates[i]}');
+    print('efficiency: ${efficiencyWeek[i].toString()}');
+  }
+  return efficiencyWeek;
 }

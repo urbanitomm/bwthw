@@ -30,7 +30,7 @@ abstract class SleepDao {
   Future<double?> findDuration(String date);
 
   @Query(
-      'SELECT duration FROM Sleepentry WHERE (date = :date1) OR (date = :date2) OR (date = :date3) OR (date = :date4) OR (date = :date5) OR (date = :date6) OR (date = :date7')
+      'SELECT duration FROM Sleepentry WHERE (date = :date1) OR (date = :date2) OR (date = :date3) OR (date = :date4) OR (date = :date5) OR (date = :date6) OR (date = :date7)')
   Future<List<double?>?> findWeekDuration(String date1, String date2,
       String date3, String date4, String date5, String date6, String date7);
 
@@ -40,7 +40,7 @@ abstract class SleepDao {
   Future<double?> findEfficiency(String date);
 
   @Query(
-      'SELECT duration FROM Sleepentry WHERE (date = :date1) OR (date = :date2) OR (date = :date3) OR (date = :date4) OR (date = :date5) OR (date = :date6) OR (date = :date7')
+      'SELECT duration FROM Sleepentry WHERE (date = :date1) OR (date = :date2) OR (date = :date3) OR (date = :date4) OR (date = :date5) OR (date = :date6) OR (date = :date7)')
   Future<List<double?>?> findWeekEfficiency(String date1, String date2,
       String date3, String date4, String date5, String date6, String date7);
 
