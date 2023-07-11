@@ -70,7 +70,7 @@ class ProviderSleep extends ChangeNotifier {
       String date6,
       String date7) async {
     final results = await database.sleepDao
-        .findWeekDuration(date1, date2, date3, date4, date5, date6, date7);
+        .findWeekEfficiency(date1, date2, date3, date4, date5, date6, date7);
     return results;
   }
 
