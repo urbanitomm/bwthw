@@ -64,7 +64,8 @@ class _DataState extends State<Data> {
 
       var prev_date = DateTime.parse(selectedDate);
       prev_date = prev_date.subtract(Duration(days: 1));
-      var prev_date_formatted = dateToString(prev_date);
+      var prev_date_formatted = dateToString(prev_date).substring(0, 10);
+      print('prev_date_formatted: $prev_date_formatted');
       heartRates_prev_day = await _requestDataHR(context, prev_date_formatted);
       //I retrieve data from both current day and previous day since sometimes it's necessary to have HR data from the startaime to midnight
       await insertHeartRates(heartRates, context, selectedDate);
@@ -72,6 +73,12 @@ class _DataState extends State<Data> {
 
       Sleep? requ_sleep = await _requestDataSleep(context, selectedDate);
       await insertSleep(requ_sleep, context, selectedDate);
+
+      double? st = await Provider.of<ProviderSleep>(context, listen: false)
+          .findStartTime(selectedDate);
+      if (st == null) {
+        st = 0;
+      }
 
       effWeek = await efficiencyWeek(context, selectedDate);
 
@@ -138,7 +145,7 @@ class _DataState extends State<Data> {
                 );
                 if (selectedDate != null) {
                   _dateController.text = dateToString(selectedDate);
-                  _loadData();
+                  await _loadData();
                 }
               },
             ),
@@ -216,7 +223,7 @@ class _DataState extends State<Data> {
           height: 50,
           child: Center(
             child: Text(
-              'Sleep effinciency in the last week',
+              'Sleep efficiency in the last week',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -500,7 +507,7 @@ Future<List<HeartRate>> _requestDataHR(
 
   if (response.statusCode == 200) {
     final decodedResponse = jsonDecode(response.body);
-
+    print('-------REQUESTING HR ----------');
     for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
       resultHr.add(HeartRate.fromJson(decodedResponse['data']['data'][i]));
     }
@@ -514,6 +521,8 @@ Future<List<HeartRate>> _requestDataHR(
 Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
     String dateFormatted) async {
   List<HREntity> hrEntities = [];
+  print(
+      '---------------------------DATA FROM INSERT HEART RATES---------------------------');
   print('dateFormatted');
   print(dateFormatted); //dateFormatted is in the format yyyy-MM-dd
 
@@ -684,7 +693,7 @@ Future<bool?> AlcolCheck(String date, BuildContext context) async {
 
   Sleepentry? sleepentry_current_day =
       await Provider.of<ProviderSleep>(context, listen: false)
-          .findDateSleep(previousDate);
+          .findDateSleep(date);
   bool efficiency_param;
   bool sleep_time_param;
   bool HR_param;

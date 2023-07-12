@@ -311,7 +311,7 @@ class _$HRdao extends HRdao {
     double time2,
   ) async {
     return _queryAdapter.queryList(
-        'SELECT value FROM HREntity WHERE (date = ?1) AND (time >= ?2) AND (time <= ?3',
+        'SELECT value FROM HREntity WHERE (date = ?1) AND (time >= ?2) AND (time <= ?3)',
         mapper: (Map<String, Object?> row) => row.values.first as int,
         arguments: [date, time1, time2]);
   }
