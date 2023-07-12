@@ -4,6 +4,9 @@ import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/screens/login.dart';
+import 'package:provider/provider.dart';
+import 'package:progetto_wearable/repository/localizatioProvider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Options extends StatelessWidget {
   const Options({Key? key}) : super(key: key);
@@ -28,6 +31,7 @@ class OptionState extends State<OptionS> {
   bool isDarkModeEnabled = true; //default value
   bool isMonitoringEnabled = true; //default value
   bool isGeolocalizationEnabled = true; //default value
+  LocationPermission permission = LocationPermission.always;
   bool isConditionAccepted = true; //default value
 
   @override
@@ -40,8 +44,11 @@ class OptionState extends State<OptionS> {
     final sp = await SharedPreferences.getInstance();
     setState(() {
       isDarkModeEnabled = sp.getBool('isDarkModeEnabled') ?? false;
-      isMonitoringEnabled = sp.getBool('isMonitoringEnabled') ?? true;
-      isGeolocalizationEnabled = sp.getBool('isGeolocalizationEnabled') ?? true;
+      isGeolocalizationEnabled =
+          Provider.of<GeolocationProvider>(context, listen: false)
+              .serviceEnabled1;
+      permission =
+          Provider.of<GeolocationProvider>(context, listen: false).permission1;
       isConditionAccepted = sp.getBool('isConditionAccepted') ?? true;
     });
   }
@@ -52,11 +59,80 @@ class OptionState extends State<OptionS> {
   }
 
   Future<void> logout(bool value) async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.remove("username");
-    print('SP cleaned');
-    Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => const Login()), (route) => false);
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Dialog cannot be dismissed by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          content: Container(
+            decoration: BoxDecoration(
+              color: Colors.yellow, // Set the desired background color
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Text('Confirmation'),
+                      const SizedBox(height: 16.0),
+                      const Text('Are you sure you want to log out?'),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isConditionAccepted = true;
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 129, 7, 143),
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        // Mark the onPressed callback as async
+                        final sharedPreferences =
+                            await SharedPreferences.getInstance();
+                        await sharedPreferences.remove("username");
+                        print('SP cleaned');
+                        Navigator.of(context).pop();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const Login()),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text(
+                        'Log out',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 129, 7, 143),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -90,25 +166,20 @@ class OptionState extends State<OptionS> {
             ),
             const Divider(height: 0),
             SwitchListTile(
-              value: isMonitoringEnabled,
-              onChanged: (bool value2) {
-                setState(() {
-                  isMonitoringEnabled = value2;
-                });
-                _saveThemePreference('isMonitoringEnabled', value2);
-              },
-              title: const Text('Monitoring'),
-              subtitle:
-                  const Text('Switch on and off the monitoring on your fitbit'),
-            ),
-            const Divider(height: 0),
-            SwitchListTile(
               value: isGeolocalizationEnabled,
               onChanged: (bool value3) {
                 setState(() {
-                  isGeolocalizationEnabled = value3;
+                  if (value3) {
+                    Provider.of<GeolocationProvider>(context, listen: false)
+                        .enableGeolocalizatio(true, LocationPermission.always);
+                    isGeolocalizationEnabled = value3;
+                  } else {
+                    Provider.of<GeolocationProvider>(context, listen: false)
+                        .disableGeolocalizatio(
+                            false, LocationPermission.denied);
+                    isGeolocalizationEnabled = value3;
+                  }
                 });
-                _saveThemePreference('isGeolocalizationEnabled', value3);
               },
               title: const Text('Geolocation'),
               subtitle: const Text('Switch on and off geolocation'),
@@ -118,9 +189,9 @@ class OptionState extends State<OptionS> {
               value: isConditionAccepted,
               onChanged: (bool value4) {
                 setState(() {
-                  isConditionAccepted = value4;
+                  isConditionAccepted = true;
                 });
-                _saveThemePreference('isConditionAccepted', value4);
+                _saveThemePreference('isConditionAccepted', true);
                 if (!value4) {
                   logout(value4);
                 }

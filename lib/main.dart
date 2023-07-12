@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/screens/login.dart';
 import 'package:progetto_wearable/utils/notifi_service.dart';
+import 'package:progetto_wearable/repository/localizatioProvider.dart';
 
 Future<void> main() async {
   //This is a special method that use WidgetFlutterBinding to interact with the Flutter engine.
@@ -38,6 +39,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<ProviderSleep>(
           create: (_) => ProviderSleep(database: database),
+        ),
+        ChangeNotifierProvider<GeolocationProvider>(
+          create: (_) => GeolocationProvider(),
         ),
       ],
       child: const MyApp(),

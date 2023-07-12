@@ -65,6 +65,19 @@ class MyDrawer extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(
+                  Icons.place,
+                  color: Color.fromARGB(255, 129, 7, 143),
+                  size: 50,
+                ),
+                title: const Text("MAPS", style: TextStyle(fontSize: 17)),
+                selectedColor: Colors.yellow,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MapView()));
+                },
+              ),
+              ListTile(
+                leading: const Icon(
                   Icons.settings,
                   color: Color.fromARGB(255, 129, 7, 143),
                   size: 50,
@@ -92,19 +105,6 @@ class MyDrawer extends StatelessWidget {
                     print('SP cleaned');
                     _toLoginPage(context);
                   }),
-              ListTile(
-                leading: const Icon(
-                  Icons.settings,
-                  color: Color.fromARGB(255, 129, 7, 143),
-                  size: 50,
-                ),
-                title: const Text("MAPS", style: TextStyle(fontSize: 17)),
-                selectedColor: Colors.yellow,
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MapView()));
-                },
-              ),
             ],
           ),
         );

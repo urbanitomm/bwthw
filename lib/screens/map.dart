@@ -1,12 +1,17 @@
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:app_settings/app_settings.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geodesy/geodesy.dart';
-import 'package:progetto_wearable/utils/notifi_service.dart';
-import 'package:progetto_wearable/utils/mydrawer.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
+import 'package:provider/provider.dart';
+import 'dart:async';
+import 'package:progetto_wearable/repository/localizatioProvider.dart';
+import 'package:progetto_wearable/screens/Options.dart';
+import 'package:progetto_wearable/screens/homepage.dart';
 import 'package:progetto_wearable/utils/myappbar.dart';
+import 'package:progetto_wearable/utils/mydrawer.dart';
+import 'package:progetto_wearable/utils/notifi_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -16,50 +21,109 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  LatLng? currentLocation; // Nullable type
+  LatLng currentLocation = LatLng(0.0, 0.0);
   final Geodesy geodesy = Geodesy();
-  Future<void> sendNotificationIfCurrentLocationMatchesLogo() async {
-    if (currentLocation != null) {
-      //Calculate the distance in meters between two geo points. If radius is not specified, Earth radius will be used.
-      final num distance = geodesy.distanceBetweenTwoGeoPoints(
-        LatLng(45.560392, 11.535826),
-        //currentLocation!,
-        //LatLng(45.408945, 11.894460), //dei position
-        currentLocation!,
-      );
-
-      if (distance < 50) {
-        NotificationService().showNotification(
-            title:
-                'You are nearby a hotspot. If you need support, call an emergency number!');
-      }
-    }
-  }
+  StreamSubscription<Position>? positionStream;
+  late MapController _mapController;
+  bool didFetchLocation = false;
 
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
+    _mapController = MapController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!didFetchLocation) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        getCurrentLocation();
+      });
+      didFetchLocation = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    positionStream?.cancel();
+    super.dispose();
+  }
+
+  Future<void> sendNotificationIfCurrentLocationMatchesLogo() async {
+    bool isGeolocalizationEnabled =
+        Provider.of<GeolocationProvider>(context, listen: false)
+            .serviceEnabled1;
+    LocationPermission permission =
+        Provider.of<GeolocationProvider>(context, listen: false).permission1;
+    if (isGeolocalizationEnabled && permission != LocationPermission.denied) {
+      final num distance = geodesy.distanceBetweenTwoGeoPoints(
+        LatLng(45.560392, 11.535826),
+        currentLocation,
+      );
+
+      if (distance < 50) {
+        NotificationService().showNotification(
+          id: 3,
+          title:
+              'You are nearby a hotspot. If you need support, call an emergency number!',
+        );
+      }
+    }
   }
 
   Future<void> getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      await AppSettings.openAppSettings(type: AppSettingsType.location);
+    Location location = Location();
 
-      // Open app settings
-      // Location permission will be checked again after returning from app settings
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Handle scenario when user denied permission forever
+    LocationData? locationData;
+
+    bool isGeolocalizationEnabled =
+        Provider.of<GeolocationProvider>(context, listen: false)
+            .serviceEnabled1;
+    LocationPermission permission =
+        Provider.of<GeolocationProvider>(context, listen: false).permission1;
+
+    if (!isGeolocalizationEnabled || permission == LocationPermission.denied) {
+      await location.enableBackgroundMode(enable: false);
+      await NotificationService().cancelNotification();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return Options(
+              /*
+              snackbarMessage:
+                  'You should activate geolocalization to access this page'*/
+              );
+        }));
+      });
+      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.deepOrange,
+        content:
+            Text('You should activate geolocalization to access to this page'),
+        duration: const Duration(seconds: 2),
+      ));*/
       return;
     }
-    //await AppSettings.openAppSettings(type: AppSettingsType.notification);
-    final position = await Geolocator.getCurrentPosition();
+
+    await location.enableBackgroundMode(enable: true);
+    locationData = await location.getLocation();
+
     setState(() {
-      currentLocation = LatLng(position.latitude, position.longitude);
+      currentLocation =
+          LatLng(locationData!.latitude ?? 0.0, locationData.longitude ?? 0.0);
     });
-    await sendNotificationIfCurrentLocationMatchesLogo();
+    _mapController.move(currentLocation, 18);
+
+    positionStream =
+        Geolocator.getPositionStream().listen((Position? position) {
+      if (position != null) {
+        setState(() {
+          currentLocation = LatLng(position.latitude, position.longitude);
+        });
+        _mapController.move(currentLocation, 18);
+        sendNotificationIfCurrentLocationMatchesLogo();
+      }
+    });
   }
 
   @override
@@ -69,18 +133,19 @@ class _MapViewState extends State<MapView> {
       drawer: MyDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //sendNotificationIfCurrentLocationMatchesLogo();
-          //NotificationService().showNotification(title: 'You are here!');
-          Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return const Homepage();
+          }));
         },
         child: const Icon(Icons.arrow_back),
       ),
       body: Material(
         child: currentLocation != null
             ? FlutterMap(
+                mapController: _mapController,
                 options: MapOptions(
-                  center: currentLocation!,
-                  zoom: 18,
+                  center: currentLocation,
+                  zoom: 16,
                 ),
                 nonRotatedChildren: [
                   RichAttributionWidget(
@@ -103,100 +168,43 @@ class _MapViewState extends State<MapView> {
                   MarkerLayer(
                     markers: [
                       Marker(
-                        point: LatLng(51.509364, -0.128928),
+                        point: currentLocation!,
                         width: 80,
                         height: 80,
-                        builder: (context) => FlutterLogo(),
+                        builder: (context) => Icon(
+                          Icons.circle,
+                          color: Colors.yellow,
+                          size: 40,
+                        ),
                       ),
-                    ],
-                  ),
-                ],
-              )
-            : Center(
-                child: CircularProgressIndicator(), // or any loading indicator
-              ),
-      ),
-    );
-  }
-}
-
-/*class MapView extends StatefulWidget {
-  const MapView({Key? key}) : super(key: key);
-
-  @override
-  _MapViewState createState() => _MapViewState();
-}
-
-class _MapViewState extends State<MapView> {
-  LatLng? currentLocation; // Nullable type
-
-  @override
-  void initState() {
-    super.initState();
-    getCurrentLocation();
-  }
-
-  Future<void> getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      await AppSettings.openAppSettings(type: AppSettingsType.location);
-      // Open app settings
-      // Location permission will be checked again after returning from app settings
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Handle scenario when user denied permission forever
-      return;
-    }
-    final position = await Geolocator.getCurrentPosition();
-    setState(() {
-      currentLocation = LatLng(position.latitude, position.longitude);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Material(
-        child: currentLocation != null
-            ? FlutterMap(
-                options: MapOptions(
-                  center: currentLocation!,
-                  zoom: 18,
-                ),
-                nonRotatedChildren: [
-                  RichAttributionWidget(
-                    attributions: [
-                      TextSourceAttribution(
-                        'OpenStreetMap contributors',
-                        onTap: () => launchUrl(
-                          Uri.parse('https://openstreetmap.org/copyright'),
+                      Marker(
+                        point: LatLng(45.408945, 11.894460),
+                        width: 80,
+                        height: 80,
+                        builder: (context) => Icon(
+                          Icons.circle,
+                          color: Colors.yellow,
+                          size: 40,
+                        ),
+                      ),
+                      Marker(
+                        point: LatLng(45.560392, 11.535826),
+                        width: 80,
+                        height: 80,
+                        builder: (context) => Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 40,
                         ),
                       ),
                     ],
                   ),
                 ],
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.app',
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: LatLng(51.509364, -0.128928),
-                        width: 80,
-                        height: 80,
-                        builder: (context) => FlutterLogo(),
-                      ),
-                    ],
-                  ),
-                ],
               )
             : Center(
-                child: CircularProgressIndicator(), // or any loading indicator
+                child: CircularProgressIndicator(),
               ),
       ),
     );
   }
-}*/
+}
