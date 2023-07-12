@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
-//import 'dart:js';
-//import 'dart:js_util';
-//import 'dart:js' as js;
 
 import 'package:fl_chart/fl_chart.dart';
 
@@ -12,13 +9,13 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:progetto_wearable/database/entities/HRentity.dart';
 import 'package:progetto_wearable/models/hr.dart';
-//import 'package:progetto_wearable/models/restingHr.dart';
+
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:progetto_wearable/models/sleep.dart';
 import 'package:progetto_wearable/utils/impact.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:syncfusion_flutter_charts/charts.dart';
+
 import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:progetto_wearable/repository/providerHR.dart';
 import 'package:progetto_wearable/repository/providerSleep.dart';
@@ -35,11 +32,6 @@ class Data extends StatefulWidget {
 }
 
 class _DataState extends State<Data> {
-  final List<Color> gradientColors = [
-    const Color(0xff23b6e6),
-    const Color(0xff02d39a),
-  ];
-
   final _dateController = TextEditingController();
   String string_result_alcol_check = '';
   //...era qui//
@@ -51,10 +43,6 @@ class _DataState extends State<Data> {
   bool _isLoading = false;
 
   Future<void> _loadData() async {
-    //final selectedDate = _dateController.text;
-    //heartRates = await _dataSourceFuture;
-    //heartRates = await _requestDataHR(context, selectedDate);
-
     setState(() {
       _isLoading = true;
     });
@@ -64,7 +52,8 @@ class _DataState extends State<Data> {
       if (_dateController.text.isEmpty) {
         selectedDate = (DateTime.now().subtract(Duration(days: 1))).toString();
 
-        List<String> date = selectedDate.split(' ');
+        List<String> date = [];
+        date = selectedDate.split(' ');
         selectedDate = date[0];
       } else {
         selectedDate = _dateController.text;
@@ -72,7 +61,7 @@ class _DataState extends State<Data> {
       print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
-      print('fatto heartRates');
+
       var prev_date = DateTime.parse(selectedDate);
       prev_date = prev_date.subtract(Duration(days: 1));
       var prev_date_formatted = dateToString(prev_date);
@@ -85,10 +74,8 @@ class _DataState extends State<Data> {
       await insertSleep(requ_sleep, context, selectedDate);
 
       effWeek = await efficiencyWeek(context, selectedDate);
-      print('effWeek: $effWeek');
 
       durWeek = await durationWeek(context, selectedDate);
-      print('durWeek: $durWeek');
 
       bool? result_alcol_check = await AlcolCheck(selectedDate, context);
       if (result_alcol_check == null) {
@@ -123,21 +110,13 @@ class _DataState extends State<Data> {
 
   @override
   Widget build(BuildContext context) {
-    double maxDuration = 0;
-    if (durWeek != null) {
-      maxDuration = durWeek
-          .map((e) => e['duration'] ?? 0)
-          .reduce((a, b) => a > b ? a : b);
-      maxDuration = ((maxDuration / 2).ceil() * 2);
-    }
-
-    int maxHR = 0;
+    /*int maxHR = 0;
     if (heartRates != null) {
       maxHR = heartRates.map((hr) => hr.value).reduce((a, b) => a > b ? a : b);
       maxHR = ((maxHR / 10).ceil() * 10).toInt();
     }
+*/
 
-    /// inserire in riga 76 per il DB
     return SingleChildScrollView(
         child: Column(
       children: [
@@ -180,7 +159,7 @@ class _DataState extends State<Data> {
               ),
               textAlign: TextAlign.center,
             ),
-          ), // Set the height of the SizedBox widget to a smaller value
+          ),
         ),
         // ALCOHOL Graph
         SizedBox(
@@ -189,7 +168,7 @@ class _DataState extends State<Data> {
             LineChartData(
                 minX: 0,
                 minY: 0,
-                maxY: maxHR.toDouble(),
+                maxY: 200, //maxHR.toDouble(),
                 gridData: FlGridData(
                   show: true,
                   getDrawingHorizontalLine: (value) {
@@ -234,10 +213,7 @@ class _DataState extends State<Data> {
         ),
         // SPACING
         SizedBox(
-          height:
-              50, // Set the height of the SizedBox widget to a smaller value
-          // add a text in the vertical center
-
+          height: 50,
           child: Center(
             child: Text(
               'Sleep effinciency in the last week',
@@ -319,10 +295,7 @@ class _DataState extends State<Data> {
                 : Center(child: Text('No data'))),
         // SPACING
         SizedBox(
-          height:
-              50, // Set the height of the SizedBox widget to a smaller value
-          // add a text in the vertical center
-
+          height: 50,
           child: Center(
             child: Text(
               'Sleep duration in the last week',
@@ -340,7 +313,7 @@ class _DataState extends State<Data> {
           child: durWeek.isNotEmpty
               ? BarChart(
                   BarChartData(
-                      maxY: maxDuration, // maxDuration + 1
+                      maxY: 12, // maxDuration + 1
                       borderData: FlBorderData(
                           border: const Border(
                         top: BorderSide.none,
@@ -435,16 +408,12 @@ Future<int?> _authorize() async {
   };
 
   //Send request
-  print('sending request');
-  print('URL is ' + url);
-  print('body is ' + body.toString());
 
   final response = await http.post(
     Uri.parse(url),
     body: body,
   );
 
-  print('chack response' + response.statusCode.toString());
   //Check response
   if (response.statusCode == 200) {
     //Decode response
@@ -512,11 +481,6 @@ Future<List<HeartRate>> _requestDataHR(
   }
 
   //Create request
-  //DateTime date = DateTime.now().subtract(const Duration(days: 1));
-  //String dateFormatted = dateToString(date);
-
-  //final url = Impact.baseUrl + hrEndpoint;
-  //print(Impact.hrEndpoint);
   final url = Impact.baseUrl +
       '/data/v1/heart_rate/patients/Jpefaq6m58/day/' +
       date +

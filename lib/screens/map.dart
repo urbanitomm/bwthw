@@ -22,13 +22,13 @@ class _MapViewState extends State<MapView> {
     if (currentLocation != null) {
       //Calculate the distance in meters between two geo points. If radius is not specified, Earth radius will be used.
       final num distance = geodesy.distanceBetweenTwoGeoPoints(
-        LatLng(45.560392, 11.535826),
+        //LatLng(45.560392, 11.535826),
         //currentLocation!,
-        //LatLng(45.408945, 11.894460), //dei position
+        LatLng(45.408945, 11.894460), //dei position
         currentLocation!,
       );
 
-      if (distance < 50) {
+      if (distance < 100) {
         NotificationService().showNotification(
             title:
                 'You are nearby a hotspot. If you need support, call an emergency number!');
