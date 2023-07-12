@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
-//import 'dart:js';
-//import 'dart:js_util';
-//import 'dart:js' as js;
 
 import 'package:fl_chart/fl_chart.dart';
 
@@ -12,13 +9,13 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:progetto_wearable/database/entities/HRentity.dart';
 import 'package:progetto_wearable/models/hr.dart';
-//import 'package:progetto_wearable/models/restingHr.dart';
+
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:progetto_wearable/models/sleep.dart';
 import 'package:progetto_wearable/utils/impact.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:syncfusion_flutter_charts/charts.dart';
+
 import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:progetto_wearable/repository/providerHR.dart';
 import 'package:progetto_wearable/repository/providerSleep.dart';
@@ -35,25 +32,17 @@ class Data extends StatefulWidget {
 }
 
 class _DataState extends State<Data> {
-  final List<Color> gradientColors = [
-    const Color(0xff23b6e6),
-    const Color(0xff02d39a),
-  ];
-
   final _dateController = TextEditingController();
   String string_result_alcol_check = '';
   //...era qui//
   List<HeartRate> heartRates = [];
   List<HeartRate> heartRates_prev_day = [];
   List<Map<String, double?>> effWeek = [];
+  List<Map<String, double?>> durWeek = [];
 
   bool _isLoading = false;
 
   Future<void> _loadData() async {
-    //final selectedDate = _dateController.text;
-    //heartRates = await _dataSourceFuture;
-    //heartRates = await _requestDataHR(context, selectedDate);
-
     setState(() {
       _isLoading = true;
     });
@@ -63,7 +52,8 @@ class _DataState extends State<Data> {
       if (_dateController.text.isEmpty) {
         selectedDate = (DateTime.now().subtract(Duration(days: 1))).toString();
 
-        List<String> date = selectedDate.split(' ');
+        List<String> date = [];
+        date = selectedDate.split(' ');
         selectedDate = date[0];
       } else {
         selectedDate = _dateController.text;
@@ -71,6 +61,7 @@ class _DataState extends State<Data> {
       print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
+
       var prev_date = DateTime.parse(selectedDate);
       prev_date = prev_date.subtract(Duration(days: 1));
       var prev_date_formatted = dateToString(prev_date);
@@ -83,7 +74,9 @@ class _DataState extends State<Data> {
       await insertSleep(requ_sleep, context, selectedDate);
 
       effWeek = await efficiencyWeek(context, selectedDate);
-      print('effWeek: $effWeek');
+
+      durWeek = await durationWeek(context, selectedDate);
+
       bool? result_alcol_check = await AlcolCheck(selectedDate, context);
       if (result_alcol_check == null) {
         setState(() {
@@ -117,7 +110,13 @@ class _DataState extends State<Data> {
 
   @override
   Widget build(BuildContext context) {
-    /// inserire in riga 76 per il DB
+    /*int maxHR = 0;
+    if (heartRates != null) {
+      maxHR = heartRates.map((hr) => hr.value).reduce((a, b) => a > b ? a : b);
+      maxHR = ((maxHR / 10).ceil() * 10).toInt();
+    }
+*/
+
     return SingleChildScrollView(
         child: Column(
       children: [
@@ -160,7 +159,7 @@ class _DataState extends State<Data> {
               ),
               textAlign: TextAlign.center,
             ),
-          ), // Set the height of the SizedBox widget to a smaller value
+          ),
         ),
         // ALCOHOL Graph
         SizedBox(
@@ -169,7 +168,7 @@ class _DataState extends State<Data> {
             LineChartData(
                 minX: 0,
                 minY: 0,
-                maxY: 200,
+                maxY: 200, //maxHR.toDouble(),
                 gridData: FlGridData(
                   show: true,
                   getDrawingHorizontalLine: (value) {
@@ -214,10 +213,7 @@ class _DataState extends State<Data> {
         ),
         // SPACING
         SizedBox(
-          height:
-              50, // Set the height of the SizedBox widget to a smaller value
-          // add a text in the vertical center
-
+          height: 50,
           child: Center(
             child: Text(
               'Sleep effinciency in the last week',
@@ -229,71 +225,161 @@ class _DataState extends State<Data> {
             ),
           ),
         ),
+        if (_isLoading) CircularProgressIndicator(),
         SizedBox(
             height: 300,
-            child: BarChart(
-              BarChartData(
-                  maxY: 100,
-                  borderData: FlBorderData(
-                      border: const Border(
-                    top: BorderSide.none,
-                    right: BorderSide(color: Colors.blue, width: 1),
-                    left: BorderSide(color: Colors.blue, width: 1),
-                    bottom: BorderSide(color: Colors.blue, width: 1),
-                  )),
-                  groupsSpace: 10,
-                  barGroups: [
-                    BarChartGroupData(x: 0, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[0]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
+            child: effWeek.isNotEmpty
+                ? BarChart(
+                    BarChartData(
+                        maxY: 100,
+                        borderData: FlBorderData(
+                            border: const Border(
+                          top: BorderSide.none,
+                          right: BorderSide(color: Colors.blue, width: 1),
+                          left: BorderSide(color: Colors.blue, width: 1),
+                          bottom: BorderSide(color: Colors.blue, width: 1),
+                        )),
+                        groupsSpace: 10,
+                        barGroups: [
+                          BarChartGroupData(x: 0, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[0]['efficiency'] ?? 0,
+                              color: Colors.red,
+                              width: 20,
+                            ),
+                          ]),
+                          BarChartGroupData(x: 1, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[1]['efficiency'] ?? 0,
+                              color: Colors.blue,
+                              width: 20,
+                            ),
+                          ]),
+                          BarChartGroupData(x: 2, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[2]['efficiency'] ?? 0,
+                              color: Colors.blue,
+                              width: 20,
+                            ),
+                          ]),
+                          BarChartGroupData(x: 3, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[3]['efficiency'] ?? 0,
+                              color: Colors.blue,
+                              width: 20,
+                            ),
+                          ]),
+                          BarChartGroupData(x: 4, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[4]['efficiency'] ?? 0,
+                              color: Colors.blue,
+                              width: 20,
+                            ),
+                          ]),
+                          BarChartGroupData(x: 5, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[5]['efficiency'] ?? 0,
+                              color: Colors.blue,
+                              width: 20,
+                            ),
+                          ]),
+                          BarChartGroupData(x: 6, barRods: [
+                            BarChartRodData(
+                              toY: effWeek[6]['efficiency'] ?? 0,
+                              color: Colors.blue,
+                              width: 20,
+                            ),
+                          ]),
+                        ]),
+                  )
+                : Center(child: Text('No data'))),
+        // SPACING
+        SizedBox(
+          height: 50,
+          child: Center(
+            child: Text(
+              'Sleep duration in the last week',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        if (_isLoading) CircularProgressIndicator(),
+        SizedBox(
+          height: 300,
+          child: durWeek.isNotEmpty
+              ? BarChart(
+                  BarChartData(
+                      maxY: 12, // maxDuration + 1
+                      borderData: FlBorderData(
+                          border: const Border(
+                        top: BorderSide.none,
+                        right: BorderSide(color: Colors.blue, width: 1),
+                        left: BorderSide(color: Colors.blue, width: 1),
+                        bottom: BorderSide(color: Colors.blue, width: 1),
+                      )),
+                      groupsSpace: 10,
+                      titlesData: FlTitlesData(
+                        show: true,
+                        bottomTitles: AxisTitles(),
                       ),
-                    ]),
-                    BarChartGroupData(x: 1, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[1]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
-                      ),
-                    ]),
-                    BarChartGroupData(x: 2, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[2]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
-                      ),
-                    ]),
-                    BarChartGroupData(x: 3, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[3]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
-                      ),
-                    ]),
-                    BarChartGroupData(x: 4, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[4]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
-                      ),
-                    ]),
-                    BarChartGroupData(x: 5, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[5]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
-                      ),
-                    ]),
-                    BarChartGroupData(x: 6, barRods: [
-                      BarChartRodData(
-                        toY: effWeek[6]['efficiency'] ?? 0,
-                        color: Colors.blue,
-                        width: 20,
-                      ),
-                    ]),
-                  ]),
-            )),
+                      barGroups: [
+                        BarChartGroupData(x: 0, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[0]['duration'] ?? 0,
+                            color: Colors.red,
+                            width: 20,
+                          ),
+                        ]),
+                        BarChartGroupData(x: 1, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[1]['duration'] ?? 0,
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ]),
+                        BarChartGroupData(x: 2, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[2]['duration'] ?? 0,
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ]),
+                        BarChartGroupData(x: 3, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[3]['duration'] ?? 0,
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ]),
+                        BarChartGroupData(x: 4, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[4]['duration'] ?? 0,
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ]),
+                        BarChartGroupData(x: 5, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[5]['duration'] ?? 0,
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ]),
+                        BarChartGroupData(x: 6, barRods: [
+                          BarChartRodData(
+                            toY: durWeek[6]['duration'] ?? 0,
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ]),
+                      ]),
+                )
+              : Text('No data available'),
+        ),
 
         Container(
           padding: const EdgeInsets.all(10),
@@ -314,7 +400,7 @@ class _DataState extends State<Data> {
 // This method allows to obtain the JWT token pair from IMPACT and store it in SharedPreferences
 Future<int?> _authorize() async {
   //Create request
-  //print('asked aurorization');
+  print('asking aurorization');
   final url = Impact.baseUrl + Impact.tokenEndpoint;
   final body = {
     'username': Impact.username,
@@ -322,6 +408,7 @@ Future<int?> _authorize() async {
   };
 
   //Send request
+
   final response = await http.post(
     Uri.parse(url),
     body: body,
@@ -378,6 +465,7 @@ Future<int> _refreshToken() async {
 // This method allows to obtain the HR data from IMPACT
 Future<List<HeartRate>> _requestDataHR(
     BuildContext context, String date) async {
+  print('before authorize');
   final result = await _authorize();
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
@@ -393,11 +481,6 @@ Future<List<HeartRate>> _requestDataHR(
   }
 
   //Create request
-  //DateTime date = DateTime.now().subtract(const Duration(days: 1));
-  //String dateFormatted = dateToString(date);
-
-  //final url = Impact.baseUrl + hrEndpoint;
-  //print(Impact.hrEndpoint);
   final url = Impact.baseUrl +
       '/data/v1/heart_rate/patients/Jpefaq6m58/day/' +
       date +
@@ -454,9 +537,9 @@ Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
       time,
       heartRate.value,
     );
-    print('------------HR ENTITY FROM INSERT HEART RATES-----------------');
-    print(hrEntity);
-    print('------------END HR ENTITY FROM INSERT HEART RATES-----------------');
+    //print('------------HR ENTITY FROM INSERT HEART RATES-----------------');
+    //print(hrEntity);
+    //print('------------END HR ENTITY FROM INSERT HEART RATES-----------------');
     hrEntities.add(hrEntity);
   }
   Provider.of<ProviderHR>(context, listen: false).insertMultipleHR(hrEntities);
@@ -707,38 +790,7 @@ double meanValue(List<int?> valuesHR) {
   return sum / valuesHR.length;
 }
 
-/* PROVA CON UNA SOLA QUERY
-
-Future<List<Map<String, double?>>> efficiencyWeek(
-    BuildContext context, String selectedDate) async {
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
-  final DateTime selectedDateTime = formatter.parse(selectedDate);
-  final List<Map<String, double?>> efficiencyWeek = [];
-  List<String> dates = [];
-  print('EFF WEEK selected date is $selectedDate');
-  for (int i = 0; i < 7; i++) {
-    DateTime date = selectedDateTime.subtract(Duration(days: i));
-    dates.add(formatter.format(date));
-  }
-  print('EFF WEEK dates are $dates');
-
-  final List<double?>? efficiency = await Provider.of<ProviderSleep>(context,
-          listen: false)
-      .findWeekEfficiency(
-          dates[0], dates[1], dates[2], dates[3], dates[4], dates[5], dates[6]);
-
-  for (int i = 0; i < efficiency!.length; i++) {
-    Map<String, double?> data = {
-      'date': i.toDouble(),
-      'efficiency': efficiency[i],
-    };
-    efficiencyWeek.add(data);
-  }
-
-  return efficiencyWeek;
-}*/
-
-// PROVA CON 7 QUERY
+// Retreive the sleep efficiency of the last 7 days
 
 Future<List<Map<String, double?>>> efficiencyWeek(
     BuildContext context, String selectedDate) async {
@@ -759,4 +811,30 @@ Future<List<Map<String, double?>>> efficiencyWeek(
     print('efficiency: ${efficiencyWeek[i].toString()}');
   }
   return efficiencyWeek;
+}
+
+// Retreive the sleep duration of the last 7 days
+
+Future<List<Map<String, double?>>> durationWeek(
+    BuildContext context, String selectedDate) async {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateTime selectedDateTime = formatter.parse(selectedDate);
+  final List<Map<String, double?>> durationWeek = [];
+  List<String> dates = [];
+  for (int i = 0; i < 7; i++) {
+    DateTime date = selectedDateTime.subtract(Duration(days: i));
+    dates.add(formatter.format(date));
+  }
+  for (int i = 0; i < dates.length; i++) {
+    final double? duration =
+        await Provider.of<ProviderSleep>(context, listen: false)
+            .findDuration(dates[i]);
+    durationWeek.add({
+      'date': i.toDouble(),
+      'duration': duration != null ? duration / (1000 * 60 * 60) : null,
+    });
+    print('Date: ${dates[i]}');
+    print('duration: ${durationWeek[i].toString()}');
+  }
+  return durationWeek;
 }

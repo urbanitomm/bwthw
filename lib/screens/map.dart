@@ -58,11 +58,13 @@ class _MapViewState extends State<MapView> {
         Provider.of<GeolocationProvider>(context, listen: false).permission1;
     if (isGeolocalizationEnabled && permission != LocationPermission.denied) {
       final num distance = geodesy.distanceBetweenTwoGeoPoints(
-        LatLng(45.560392, 11.535826),
-        currentLocation,
+        //LatLng(45.560392, 11.535826),
+        //currentLocation!,
+        LatLng(45.408945, 11.894460), //dei position
+        currentLocation!,
       );
 
-      if (distance < 50) {
+      if (distance < 100) {
         NotificationService().showNotification(
           id: 3,
           title:
