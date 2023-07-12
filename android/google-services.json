@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "587979251004",
+    "project_id": "alcocare-6d61a",
+    "storage_bucket": "alcocare-6d61a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587979251004:android:0d2bbf4406d80ea3f85239",
+        "android_client_info": {
+          "package_name": "com.example.progetto_wearable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "587979251004-j83ac32fvcj1cmeg6pqcbkrnfjoir5be.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQ6eDaRr56Uzdmi6xJplfu0UD1QP4nBZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "587979251004-j83ac32fvcj1cmeg6pqcbkrnfjoir5be.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

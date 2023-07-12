@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "587979251004",
+    "project_id": "alcocare-6d61a",
+    "storage_bucket": "alcocare-6d61a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587979251004:android:0d2bbf4406d80ea3f85239",
+        "android_client_info": {
+          "package_name": "com.example.progetto_wearable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "587979251004-ljsj1clsktt6l4bqsus1sulbl68490lv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.progetto_wearable",
+            "certificate_hash": "2a4b7b4407c6d5e855411f664e8a82448f3394b3"
+          }
+        },
+        {
+          "client_id": "587979251004-4bi71697sf50rge6nfar2ddcdoa9gfr3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQ6eDaRr56Uzdmi6xJplfu0UD1QP4nBZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "587979251004-4bi71697sf50rge6nfar2ddcdoa9gfr3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
