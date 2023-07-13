@@ -19,7 +19,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginPage extends State<Login> {
-  bool? isTermsAccepted = false;
+  bool isTermsAccepted = false;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @override
@@ -42,17 +42,34 @@ class _LoginPage extends State<Login> {
   } //_checkLogin
 
   Future<String> _loginUser(LoginData data) async {
-    if (data.name == '1234@5678.com' &&
+    final sp = await SharedPreferences.getInstance();
+    String Email = sp.getString('email') ?? '1234@5678.com';
+    if (data.name == Email &&
         data.password == '123456' &&
         isTermsAccepted == true) {
       final sp = await SharedPreferences.getInstance();
-      sp.setString('username', data.name);
+      sp.setString('email', data.name);
+      sp.setBool('isGoogleUser', false);
 
       return '';
     } else if (data.name != '1234@5678.com' || data.password != '123456') {
       return 'Wrong credentials';
     } else {
       return 'you must accept the terms of service';
+    }
+  }
+
+  Future<void> _googleLogin() async {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser != null) {
+      final sp = await SharedPreferences.getInstance();
+      sp.setString('Google_email', googleUser.email);
+      sp.setString('Google_name', googleUser.displayName ?? '');
+
+      sp.setString('photoUrl', googleUser.photoUrl ?? '');
+
+      sp.setBool('isGoogleUser', true); // Set isGoogle to true for Google login
+      _toDiaryPage(context);
     }
   }
 
@@ -101,11 +118,75 @@ class _LoginPage extends State<Login> {
             width: MediaQuery.of(context).size.width * 0.6,
             child: ElevatedButton(
               onPressed: () async {
-                _googleSignIn.signIn().then((value) {
-                  String userName = value!.displayName!;
-                  print(userName);
-                  _toDiaryPage(context);
-                });
+                if (isTermsAccepted) {
+                  _googleLogin();
+                } else {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Terms and Conditions'),
+                        content: SingleChildScrollView(
+                          child: ListBody(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text: 'Please read and accept our ',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: 'terms and conditions',
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          const url =
+                                              'https://docs.google.com/document/d/1G4lgDh-cM-uvIU6579IitnrXjhCMJCT_2RI49GFtKUw/edit?usp=sharing';
+                                          if (await canLaunch(url)) {
+                                            await launch(url);
+                                          } else {
+                                            throw 'Could not launch $url';
+                                          }
+                                        },
+                                    ),
+                                    const TextSpan(
+                                      text: ' to continue.',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Decline'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Accept'),
+                            onPressed: () {
+                              setState(() {
+                                isTermsAccepted = true;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -129,13 +210,6 @@ class _LoginPage extends State<Login> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /*const Text(
-                'To login you must accept our terms of service',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 10,
-                ),
-              ),*/
               RichText(
                 text: TextSpan(
                   text: 'To login you must accept our ',
