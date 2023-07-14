@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:progetto_wearable/repository/localizatioProvider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:progetto_wearable/screens/map.dart';
+import 'package:app_settings/app_settings.dart';
 
 class Options extends StatelessWidget {
   const Options({Key? key}) : super(key: key);
@@ -56,6 +57,10 @@ class OptionState extends State<OptionS> {
   Future<void> _saveThemePreference(String variable, bool value) async {
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setBool(variable, value);
+  }
+
+  void openLocalizationSettings() {
+    AppSettings.openAppSettings(type: AppSettingsType.location);
   }
 
   Future<void> logout(bool value) async {
@@ -173,9 +178,32 @@ class OptionState extends State<OptionS> {
                     Provider.of<GeolocationProvider>(context, listen: false)
                         .enableGeolocalizatio(true, LocationPermission.always);
                     isGeolocalizationEnabled = value3;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MapView()),
+
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          backgroundColor: Colors
+                              .deepOrange, // Set the desired background color
+                          title: const Text('Activate the settings'),
+                          content: const Text(
+                            'You should activate geolocation to access this page',
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                openLocalizationSettings();
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
                   } else {
                     Provider.of<GeolocationProvider>(context, listen: false)
