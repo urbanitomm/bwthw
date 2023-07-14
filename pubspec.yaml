@@ -57,6 +57,16 @@ dependencies:
   google_sign_in: ^6.1.4
 
   location: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+    
+
+flutter_launcher_icons:
+  image_path_android: "assets/images/logo_login.png"
+  background_color_android: "#81078f"
+  android: true
+  image_path_ios: "assets/images/logo_login.png"
+  background_color_ios: "#81078f"
+  ios: true
   
 
 
@@ -68,12 +78,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   
-  flutter_launcher_icons: ^0.13.1
-flutter_icons:
-  image_path: "assets/images/logo.png"
-  android: true
-  ios: true
   
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
