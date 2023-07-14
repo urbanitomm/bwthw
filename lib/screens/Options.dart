@@ -29,8 +29,7 @@ class OptionS extends StatefulWidget {
 
 class OptionState extends State<OptionS> {
   bool isDarkModeEnabled = true; //default value
-  bool isMonitoringEnabled = true; //default value
-  bool isGeolocalizationEnabled = true; //default value
+  bool isGeolocalizationEnabled = false; //default value
   LocationPermission permission = LocationPermission.always;
   bool isConditionAccepted = true; //default value
 

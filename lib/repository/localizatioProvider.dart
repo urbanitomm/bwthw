@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 class GeolocationProvider with ChangeNotifier {
-  bool serviceEnabled1 = true;
-  LocationPermission permission1 = LocationPermission.always;
+  bool serviceEnabled1 = false;
+  LocationPermission permission1 = LocationPermission.denied;
 
   bool? get isEnabled => serviceEnabled1;
   LocationPermission? get permission => permission1;
