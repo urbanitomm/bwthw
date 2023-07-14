@@ -285,7 +285,12 @@ class _LoginPage extends State<Login> {
   void _toDiaryPageGoogle(BuildContext context) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     final GoogleSignInAccount? googleUser =
-        await _googleSignIn.signInSilently();
+        await _googleSignIn.signIn().catchError((onError) => print(onError));
+    ;
+    if (googleUser == null) {
+      print('null gooogle user');
+    }
+
     if (googleUser != null) {
       // If the user is logged in with Google, navigate to the homepage
       if (sp.containsKey('lastEntryDate') == false) {
@@ -310,6 +315,16 @@ class _LoginPage extends State<Login> {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const Diary()));
       }
+    } else {
+      // If the user is not logged in with Google, prompt them to log in
+      /*if (_googleSignIn.signInSilently().isCanceled) {
+    return;
+  }*/
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sign-in failed. Please try again.'),
+        ),
+      );
     }
   }
 } // LoginScreen
