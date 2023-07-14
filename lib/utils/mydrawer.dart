@@ -28,16 +28,8 @@ class MyDrawer extends StatelessWidget {
         final googleEmail = sp.getString('Google_email') ?? '';
         final photoUrl = sp.getString('photoUrl') ?? '';
         final profilePicturePath = sp.getString('profilePicture');
-        final drawerPicture;
-        if (isGoogleUser) {
-          drawerPicture = photoUrl.isNotEmpty
-              ? NetworkImage(photoUrl)
-              : AssetImage('assets/images/img.jpg');
-        } else {
-          drawerPicture =
-              profilePicturePath != null ? File(profilePicturePath) : null;
-        }
-
+        final drawerPicture =
+            profilePicturePath != null ? File(profilePicturePath) : null;
         /*final drawerPicture =
             isGoogleUser && photoUrl.isEmpty && profilePicturePath != null
                 ? File(profilePicturePath)
@@ -64,14 +56,20 @@ class MyDrawer extends StatelessWidget {
                           isGoogleUser ? Text(googleEmail) : Text('$email'),
                       currentAccountPicture: CircleAvatar(
                         backgroundColor: Colors.white,
-                        /*backgroundImage: drawerPicture != null
-                            ? FileImage(drawerPicture) as ImageProvider<Object>?
-                            : const AssetImage('assets/images/img.jpg'),*/
                         backgroundImage: drawerPicture != null
                             ? (drawerPicture is File
                                 ? FileImage(drawerPicture)
                                 : drawerPicture) as ImageProvider<Object>
                             : const AssetImage('assets/images/img.jpg'),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.7),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
                       ),
                     )
                   ],
