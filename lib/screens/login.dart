@@ -115,6 +115,7 @@ class _LoginPage extends State<Login> {
               ),
             ),
           ),
+          /*
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.6,
             child: ElevatedButton(
@@ -207,7 +208,7 @@ class _LoginPage extends State<Login> {
                 primary: Colors.white, // Set the background color of the button
               ),
             ),
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

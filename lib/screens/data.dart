@@ -116,13 +116,6 @@ class _DataState extends State<Data> {
 
   @override
   Widget build(BuildContext context) {
-    /*int maxHR = 0;
-    if (heartRates != null) {
-      maxHR = heartRates.map((hr) => hr.value).reduce((a, b) => a > b ? a : b);
-      maxHR = ((maxHR / 10).ceil() * 10).toInt();
-    }
-*/
-
     return SingleChildScrollView(
         child: Column(
       children: [
@@ -194,7 +187,7 @@ class _DataState extends State<Data> {
                         return Text(
                           '$hours:00',
                           style: TextStyle(
-                            color: Colors.black,
+                            //color: Colors.black,
                             fontSize: 10,
                           ),
                         );
@@ -207,49 +200,21 @@ class _DataState extends State<Data> {
                   leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                           showTitles: true,
-                          getTitlesWidget: (value, meta) => RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 8,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: '${value.toInt()} ',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'BPM',
-                                    ),
-                                  ],
+                          getTitlesWidget: (value, meta) => Text(
+                                '${value.toInt()}\nBPM',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ))),
                   rightTitles: AxisTitles(
                       sideTitles: SideTitles(
                           showTitles: true,
-                          getTitlesWidget: (value, meta) => RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 8,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: '${value.toInt()} ',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'BPM',
-                                    ),
-                                  ],
+                          getTitlesWidget: (value, meta) => Text(
+                                '${value.toInt()}\nBPM',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ))),
                 ),
@@ -335,7 +300,7 @@ class _DataState extends State<Data> {
                                 '${value.toInt()}',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  color: Colors.black,
+                                  //color: Colors.black,
                                   fontSize: 10,
                                 ),
                               ),
@@ -347,7 +312,7 @@ class _DataState extends State<Data> {
                                 '${value.toInt()}',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  color: Colors.black,
+                                  //color: Colors.black,
                                   fontSize: 10,
                                 ),
                               ),
@@ -361,11 +326,11 @@ class _DataState extends State<Data> {
                                     children: [
                                       Text('Selected',
                                           style: TextStyle(
-                                              color: Colors.black,
+                                              //color: Colors.black,
                                               fontSize: 8)),
                                       Text('day',
                                           style: TextStyle(
-                                              color: Colors.black,
+                                              //color: Colors.black,
                                               fontSize: 8)),
                                     ],
                                   );
@@ -374,11 +339,11 @@ class _DataState extends State<Data> {
                                     children: [
                                       Text('${value.toInt()}',
                                           style: TextStyle(
-                                              color: Colors.black,
+                                              //color: Colors.black,
                                               fontSize: 8)),
                                       Text('day before',
                                           style: TextStyle(
-                                              color: Colors.black,
+                                              //color: Colors.black,
                                               fontSize: 8)),
                                     ],
                                   );
@@ -386,10 +351,12 @@ class _DataState extends State<Data> {
                                   children: [
                                     Text('${value.toInt()}',
                                         style: TextStyle(
-                                            color: Colors.black, fontSize: 8)),
+                                            //color: Colors.black,
+                                            fontSize: 8)),
                                     Text('days before',
                                         style: TextStyle(
-                                            color: Colors.black, fontSize: 8)),
+                                            //color: Colors.black,
+                                            fontSize: 8)),
                                   ],
                                 );
                               },
@@ -537,7 +504,7 @@ class _DataState extends State<Data> {
                               '${value.toInt()} h',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                color: Colors.black,
+                                //color: Colors.black,
                                 fontSize: 10,
                               ),
                             ),
@@ -549,7 +516,7 @@ class _DataState extends State<Data> {
                               '${value.toInt()} h',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                color: Colors.black,
+                                //color: Colors.black,
                                 fontSize: 10,
                               ),
                             ),
@@ -563,10 +530,12 @@ class _DataState extends State<Data> {
                                   children: [
                                     Text('Selected',
                                         style: TextStyle(
-                                            color: Colors.black, fontSize: 8)),
+                                            //color: Colors.black,
+                                            fontSize: 8)),
                                     Text('day',
                                         style: TextStyle(
-                                            color: Colors.black, fontSize: 8)),
+                                            //color: Colors.black,
+                                            fontSize: 8)),
                                   ],
                                 );
                               if (value == 1)
@@ -574,20 +543,24 @@ class _DataState extends State<Data> {
                                   children: [
                                     Text('${value.toInt()}',
                                         style: TextStyle(
-                                            color: Colors.black, fontSize: 8)),
+                                            //color: Colors.black,
+                                            fontSize: 8)),
                                     Text('day before',
                                         style: TextStyle(
-                                            color: Colors.black, fontSize: 8)),
+                                            //color: Colors.black,
+                                            fontSize: 8)),
                                   ],
                                 );
                               return Column(
                                 children: [
                                   Text('${value.toInt()}',
                                       style: TextStyle(
-                                          color: Colors.black, fontSize: 8)),
+                                          //color: Colors.black,
+                                          fontSize: 8)),
                                   Text('days before',
                                       style: TextStyle(
-                                          color: Colors.black, fontSize: 8)),
+                                          //color: Colors.black,
+                                          fontSize: 8)),
                                 ],
                               );
                             },
@@ -1154,4 +1127,15 @@ Future<List<Map<String, double?>>> durationWeek(
     print('duration: ${durationWeek[i].toString()}');
   }
   return durationWeek;
+}
+
+// create a bool function that gives true if the shared preference 'isenabled' is true
+Future<bool> getIsDarkEnabled() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? isEnabled = prefs.getBool('isDarkModeEnabled');
+  if (isEnabled == null) {
+    return false;
+  } else {
+    return isEnabled;
+  }
 }

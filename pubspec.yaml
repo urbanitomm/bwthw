@@ -61,10 +61,10 @@ dependencies:
     
 
 flutter_launcher_icons:
-  image_path_android: "assets/images/logo_login.png"
+  image_path_android: "assets/images/transparent_logo.png" 
   background_color_android: "#81078f"
   android: true
-  image_path_ios: "assets/images/logo_login.png"
+  image_path_ios: "assets/images/transparent_logo.png"
   background_color_ios: "#81078f"
   ios: true
   
