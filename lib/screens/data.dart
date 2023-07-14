@@ -91,12 +91,12 @@ class _DataState extends State<Data> {
       } else if (result_alcol_check == true) {
         setState(() {
           string_result_alcol_check =
-              'We suppose you have consumed alcohol yesterday';
+              'We suppose you have consumed alcohol on the  $prev_date_formatted';
         });
       } else {
         setState(() {
           string_result_alcol_check =
-              'We suppose you have not consumed alcohol yesterday';
+              'We suppose you have not consumed alcohol on the  $prev_date_formatted';
         });
       }
     } catch (e) {
