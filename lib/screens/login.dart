@@ -94,6 +94,7 @@ class _LoginPage extends State<Login> {
           Expanded(
             child: FlutterLogin(
               title: 'AlcoCare',
+              logo: 'assets/images/logo_login.png',
               onLogin: _loginUser,
               onRecoverPassword: _recoverPassword,
               onSubmitAnimationCompleted: () async {
