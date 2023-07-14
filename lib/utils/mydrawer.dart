@@ -135,6 +135,7 @@ class MyDrawer extends StatelessWidget {
                     await sp.remove("Google_email");
                     await sp.remove("photoUrl");
                     await sp.remove("profilePicture");
+                    await sp.remove("logged");
 
                     print('SP cleaned');
                     _toLoginPage(context);

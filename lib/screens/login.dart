@@ -49,6 +49,7 @@ class _LoginPage extends State<Login> {
         isTermsAccepted == true) {
       final sp = await SharedPreferences.getInstance();
       sp.setString('email', data.name);
+      sp.setBool('logged', true);
       sp.setBool('isGoogleUser', false);
 
       return '';
@@ -87,6 +88,7 @@ class _LoginPage extends State<Login> {
   @override
   Widget build(BuildContext context) {
     print('Build login');
+    _isLogged(context);
 
     return Scaffold(
       body: Column(
@@ -255,10 +257,20 @@ class _LoginPage extends State<Login> {
     );
   } // build
 
+  void _isLogged(BuildContext context) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    if (sp.getBool('logged') == true) {
+      print('USer is already logged');
+      _toDiaryPage(context);
+    }
+  }
+
   //Navigation to go to the diary page
   void _toDiaryPage(BuildContext context) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     //If the user never wrote into the diary initialize the variable that tells the last time the user wrote
+    //load shared preferences
+
     if (sp.containsKey('lastEntryDate') == false) {
       //The string format is overall more compatible with other parts of the code
       sp.setString('lastEntryDate', getTodayDate());
