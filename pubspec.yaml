@@ -53,6 +53,9 @@ dependencies:
   app_settings: ^5.0.0
   flutter_local_notifications: ^15.1.0+1
   geodesy: ^0.6.0
+  firebase_core: ^2.14.0
+  google_sign_in: ^6.1.4
+
   location: ^5.0.0
 
 

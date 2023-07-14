@@ -5,6 +5,9 @@ import 'package:progetto_wearable/utils/funcs.dart';
 import 'package:progetto_wearable/screens/diary.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:progetto_wearable/database/prepopulation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -16,7 +19,9 @@ class Login extends StatefulWidget {
 }
 
 class _LoginPage extends State<Login> {
-  bool? isTermsAccepted = false;
+  bool isTermsAccepted = false;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   @override
   void initState() {
     super.initState();
@@ -37,17 +42,34 @@ class _LoginPage extends State<Login> {
   } //_checkLogin
 
   Future<String> _loginUser(LoginData data) async {
-    if (data.name == '1234@5678.com' &&
+    final sp = await SharedPreferences.getInstance();
+    String Email = sp.getString('email') ?? '1234@5678.com';
+    if (data.name == Email &&
         data.password == '123456' &&
         isTermsAccepted == true) {
       final sp = await SharedPreferences.getInstance();
-      sp.setString('username', data.name);
+      sp.setString('email', data.name);
+      sp.setBool('isGoogleUser', false);
 
       return '';
     } else if (data.name != '1234@5678.com' || data.password != '123456') {
       return 'Wrong credentials';
     } else {
       return 'you must accept the terms of service';
+    }
+  }
+
+  Future<void> _googleLogin() async {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser != null) {
+      final sp = await SharedPreferences.getInstance();
+      sp.setString('Google_email', googleUser.email);
+      sp.setString('Google_name', googleUser.displayName ?? '');
+
+      sp.setString('photoUrl', googleUser.photoUrl ?? '');
+
+      sp.setBool('isGoogleUser', true); // Set isGoogle to true for Google login
+      _toDiaryPage(context);
     }
   }
 
@@ -92,15 +114,127 @@ class _LoginPage extends State<Login> {
               ),
             ),
           ),
-
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.6,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (isTermsAccepted) {
+                  _googleLogin();
+                } else {
+                  await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Terms and Conditions'),
+                        content: SingleChildScrollView(
+                          child: ListBody(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text: 'Please read and accept our ',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: 'terms and conditions',
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          const url =
+                                              'https://docs.google.com/document/d/1G4lgDh-cM-uvIU6579IitnrXjhCMJCT_2RI49GFtKUw/edit?usp=sharing';
+                                          if (await canLaunch(url)) {
+                                            await launch(url);
+                                          } else {
+                                            throw 'Could not launch $url';
+                                          }
+                                        },
+                                    ),
+                                    const TextSpan(
+                                      text: ' to continue.',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Decline'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Accept'),
+                            onPressed: () {
+                              setState(() {
+                                isTermsAccepted = true;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/google_logo.png', // Replace with the path to your Google logo image
+                    height: 24, // Set the height of the logo
+                  ),
+                  const SizedBox(
+                      width: 8), // Add some spacing between the logo and text
+                  const Text('Login with Google',
+                      style: TextStyle(color: Colors.black)),
+                ],
+              ),
+              //child: const Text('Login with Google'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white, // Set the background color of the button
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'To login you must accept our terms of service',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 10,
+              RichText(
+                text: TextSpan(
+                  text: 'To login you must accept our ',
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontSize: 10,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'terms of service',
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () async {
+                          const url =
+                              'https://docs.google.com/document/d/1G4lgDh-cM-uvIU6579IitnrXjhCMJCT_2RI49GFtKUw/edit?usp=sharing';
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                    ),
+                  ],
                 ),
               ),
               Checkbox(
@@ -133,6 +267,13 @@ class _LoginPage extends State<Login> {
           MaterialPageRoute(builder: (context) => const Diary()));
 
       //If the user already has written in the diary they will go to the homepage
+    }
+    final GoogleSignInAccount? googleUser =
+        await _googleSignIn.signInSilently();
+    if (googleUser != null) {
+      // If the user is logged in with Google, navigate to the homepage
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const Homepage()));
     } else if (sp.getString('lastEntryDate') == getTodayDate()) {
       print("Oggi ho gia scritto");
       Navigator.of(context).pushReplacement(

@@ -23,9 +23,29 @@ class MyDrawer extends StatelessWidget {
         final name = sp.getString('name') ?? 'Giacomo';
         final surname = sp.getString('surname') ?? 'Cappon';
         final email = sp.getString('email') ?? '1234@5678.com';
+        final isGoogleUser = sp.getBool('isGoogleUser') ?? false;
+        final googleName = sp.getString('Google_name') ?? '';
+        final googleEmail = sp.getString('Google_email') ?? '';
+        final photoUrl = sp.getString('photoUrl') ?? '';
         final profilePicturePath = sp.getString('profilePicture');
-        final profilePicture =
-            profilePicturePath != null ? File(profilePicturePath) : null;
+        final drawerPicture;
+        if (isGoogleUser) {
+          drawerPicture = photoUrl.isNotEmpty
+              ? NetworkImage(photoUrl)
+              : AssetImage('assets/images/img.jpg');
+        } else {
+          drawerPicture =
+              profilePicturePath != null ? File(profilePicturePath) : null;
+        }
+
+        /*final drawerPicture =
+            isGoogleUser && photoUrl.isEmpty && profilePicturePath != null
+                ? File(profilePicturePath)
+                : profilePicturePath != null
+                    ? File(profilePicturePath)
+                    : (photoUrl.isNotEmpty
+                        ? NetworkImage(photoUrl)
+                        : AssetImage('assets/images/img.jpg'));*/
 
         return Drawer(
           child: ListView(
@@ -37,13 +57,20 @@ class MyDrawer extends StatelessWidget {
                 child: Stack(
                   children: [
                     UserAccountsDrawerHeader(
-                      accountName: Text('$name $surname'),
-                      accountEmail: Text(email),
+                      accountName: isGoogleUser
+                          ? Text(googleName)
+                          : Text('$name $surname'),
+                      accountEmail:
+                          isGoogleUser ? Text(googleEmail) : Text('$email'),
                       currentAccountPicture: CircleAvatar(
                         backgroundColor: Colors.white,
-                        backgroundImage: profilePicture != null
-                            ? FileImage(profilePicture)
-                                as ImageProvider<Object>?
+                        /*backgroundImage: drawerPicture != null
+                            ? FileImage(drawerPicture) as ImageProvider<Object>?
+                            : const AssetImage('assets/images/img.jpg'),*/
+                        backgroundImage: drawerPicture != null
+                            ? (drawerPicture is File
+                                ? FileImage(drawerPicture)
+                                : drawerPicture) as ImageProvider<Object>
                             : const AssetImage('assets/images/img.jpg'),
                       ),
                     )
@@ -102,6 +129,15 @@ class MyDrawer extends StatelessWidget {
                     SharedPreferences sp =
                         await SharedPreferences.getInstance();
                     await sp.remove("username");
+                    await sp.remove("name");
+                    await sp.remove("surname");
+                    await sp.remove("email");
+                    await sp.remove("isGoogleUser");
+                    await sp.remove("Google_name");
+                    await sp.remove("Google_email");
+                    await sp.remove("photoUrl");
+                    await sp.remove("profilePicture");
+
                     print('SP cleaned');
                     _toLoginPage(context);
                   }),
