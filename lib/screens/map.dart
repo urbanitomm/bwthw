@@ -12,6 +12,7 @@ import 'package:progetto_wearable/utils/myappbar.dart';
 import 'package:progetto_wearable/utils/mydrawer.dart';
 import 'package:progetto_wearable/utils/notifi_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app_settings/app_settings.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -89,21 +90,16 @@ class _MapViewState extends State<MapView> {
       await location.enableBackgroundMode(enable: false);
       await NotificationService().cancelNotification();
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!didFetchLocation) {
+          await AppSettings.openAppSettings(type: AppSettingsType.location);
+        }
+
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Options(
-              /*
-              snackbarMessage:
-                  'You should activate geolocalization to access this page'*/
-              );
+          return Options();
         }));
       });
-      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.deepOrange,
-        content:
-            Text('You should activate geolocalization to access to this page'),
-        duration: const Duration(seconds: 2),
-      ));*/
+
       return;
     }
 
