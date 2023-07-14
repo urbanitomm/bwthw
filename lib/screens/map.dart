@@ -85,7 +85,7 @@ class _MapViewState extends State<MapView> {
     LocationPermission permission =
         Provider.of<GeolocationProvider>(context, listen: false).permission1;
 
-    if (!isGeolocalizationEnabled || permission == LocationPermission.denied) {
+    if (!isGeolocalizationEnabled || permission != LocationPermission.always) {
       await location.enableBackgroundMode(enable: false);
       await NotificationService().cancelNotification();
 

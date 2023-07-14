@@ -55,6 +55,7 @@ dependencies:
   geodesy: ^0.6.0
   firebase_core: ^2.14.0
   google_sign_in: ^6.1.4
+  
 
   location: ^5.0.0
   flutter_launcher_icons: ^0.13.1
