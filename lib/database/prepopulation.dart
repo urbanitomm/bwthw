@@ -18,9 +18,7 @@ prepopulate(BuildContext context) async {
           dateToString(firstDate.add(const Duration(days: -13))),
           "Today I'm very sad",
           'Sad'));
-  await Provider.of<SelfReportProvider>(context, listen: false).insertReport(
-      Report(dateToString(firstDate.add(const Duration(days: -9))),
-          'a lot of alcohol \n at the bar \n yesterday afternoon'));
+
   //Entry 2
   await Provider.of<DatabaseRepository>(context, listen: false)
       .insertDiaryentry(Diaryentry(
@@ -31,6 +29,12 @@ prepopulate(BuildContext context) async {
   await Provider.of<SelfReportProvider>(context, listen: false).insertReport(
       Report(dateToString(firstDate.add(const Duration(days: -12))),
           'two drinks \n at home \n yesterday night'));
+
+  await Provider.of<DatabaseRepository>(context, listen: false)
+      .insertDiaryentry(Diaryentry(
+          dateToString(firstDate.add(const Duration(days: -11))),
+          'Good',
+          'Happy'));
   //Entry 3
   await Provider.of<DatabaseRepository>(context, listen: false)
       .insertDiaryentry(Diaryentry(
@@ -58,6 +62,19 @@ prepopulate(BuildContext context) async {
           dateToString(firstDate.add(const Duration(days: -7))),
           "Could be worse",
           'Neutral'));
+
+  await Provider.of<DatabaseRepository>(context, listen: false)
+      .insertDiaryentry(Diaryentry(
+          dateToString(firstDate.add(const Duration(days: -6))),
+          "Not so good today",
+          'Neutral'));
+
+  await Provider.of<DatabaseRepository>(context, listen: false)
+      .insertDiaryentry(Diaryentry(
+          dateToString(firstDate.add(const Duration(days: -5))),
+          "Unhappy",
+          'Sad'));
+
   //Entry 7
   await Provider.of<DatabaseRepository>(context, listen: false)
       .insertDiaryentry(Diaryentry(

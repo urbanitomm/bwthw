@@ -46,9 +46,8 @@ class _DataState extends State<Data> {
     setState(() {
       _isLoading = true;
     });
-
+    var selectedDate;
     try {
-      var selectedDate;
       if (_dateController.text.isEmpty) {
         selectedDate = (DateTime.now().subtract(Duration(days: 1))).toString();
 
@@ -64,7 +63,8 @@ class _DataState extends State<Data> {
 
       var prev_date = DateTime.parse(selectedDate);
       prev_date = prev_date.subtract(Duration(days: 1));
-      var prev_date_formatted = dateToString(prev_date);
+      var prev_date_formatted = dateToString(prev_date).substring(0, 10);
+      print('prev_date_formatted: $prev_date_formatted');
       heartRates_prev_day = await _requestDataHR(context, prev_date_formatted);
       //I retrieve data from both current day and previous day since sometimes it's necessary to have HR data from the startaime to midnight
       await insertHeartRates(heartRates, context, selectedDate);
@@ -72,6 +72,12 @@ class _DataState extends State<Data> {
 
       Sleep? requ_sleep = await _requestDataSleep(context, selectedDate);
       await insertSleep(requ_sleep, context, selectedDate);
+
+      double? st = await Provider.of<ProviderSleep>(context, listen: false)
+          .findStartTime(selectedDate);
+      if (st == null) {
+        st = 0;
+      }
 
       effWeek = await efficiencyWeek(context, selectedDate);
 
@@ -138,7 +144,7 @@ class _DataState extends State<Data> {
                 );
                 if (selectedDate != null) {
                   _dateController.text = dateToString(selectedDate);
-                  _loadData();
+                  await _loadData();
                 }
               },
             ),
@@ -162,15 +168,93 @@ class _DataState extends State<Data> {
           ),
         ),
         // ALCOHOL Graph
-        SizedBox(
-          height: 550,
-          child: LineChart(
-            LineChartData(
+        Center(
+          child: SizedBox(
+            height: 550,
+            child: LineChart(
+              LineChartData(
                 minX: 0,
                 minY: 0,
-                maxY: 200, //maxHR.toDouble(),
+                maxY: (heartRates.fold(
+                                0,
+                                (max, element) =>
+                                    element.value > max ? element.value : max) /
+                            10)
+                        .ceil() *
+                    10.0, // slower but dynamic
+                //200, faster but not dynamic!
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      final hours = ((value) / 3600).floor();
+                      if (hours == 0) return Text('');
+                      if (hours < 23) {
+                        return Text(
+                          '$hours:00',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                          ),
+                        );
+                      } else
+                        return Text('');
+                    },
+                  )),
+                  topTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) => RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 8,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: '${value.toInt()} ',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'BPM',
+                                    ),
+                                  ],
+                                ),
+                              ))),
+                  rightTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) => RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 8,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: '${value.toInt()} ',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'BPM',
+                                    ),
+                                  ],
+                                ),
+                              ))),
+                ),
                 gridData: FlGridData(
-                  show: true,
+                  show: false,
                   getDrawingHorizontalLine: (value) {
                     return const FlLine(
                       color: Colors.blue,
@@ -185,10 +269,12 @@ class _DataState extends State<Data> {
                     );
                   },
                 ),
+
                 borderData: FlBorderData(
                   show: true,
                   border: Border.all(color: Colors.blue, width: 1),
                 ),
+
                 lineBarsData: [
                   LineChartBarData(
                     spots: heartRates
@@ -203,20 +289,18 @@ class _DataState extends State<Data> {
                         show: true, color: Colors.blue.withOpacity(0.3)),
                   )
                 ],
-                titlesData: FlTitlesData(
-                  bottomTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                )),
+              ),
+            ),
           ),
         ),
         // SPACING
         SizedBox(
-          height: 50,
+          height: 70,
           child: Center(
             child: Text(
-              'Sleep effinciency in the last week',
+              _dateController.text.isEmpty
+                  ? 'Sleep efficiency in the last week'
+                  : 'Sleep efficiency in the week from ${_dateController.text} to ${dateToString(DateTime.parse(_dateController.text).subtract(Duration(days: 6)))}',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -226,12 +310,216 @@ class _DataState extends State<Data> {
           ),
         ),
         if (_isLoading) CircularProgressIndicator(),
+        Center(
+          child: SizedBox(
+              height: 300,
+              child: effWeek.isNotEmpty
+                  ? BarChart(
+                      BarChartData(
+                          gridData: FlGridData(show: false),
+                          maxY: 100,
+                          borderData: FlBorderData(
+                              border: const Border(
+                            top: BorderSide.none,
+                            right: BorderSide(color: Colors.blue, width: 1),
+                            left: BorderSide(color: Colors.blue, width: 1),
+                            bottom: BorderSide(color: Colors.blue, width: 1),
+                          )),
+                          groupsSpace: 10,
+                          titlesData: FlTitlesData(
+                            show: true,
+                            leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) => Text(
+                                '${value.toInt()}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            )),
+                            rightTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) => Text(
+                                '${value.toInt()}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            )),
+                            bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                if (value == 0)
+                                  return Column(
+                                    children: [
+                                      Text('Selected',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 8)),
+                                      Text('day',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 8)),
+                                    ],
+                                  );
+                                if (value == 1)
+                                  return Column(
+                                    children: [
+                                      Text('${value.toInt()}',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 8)),
+                                      Text('day before',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 8)),
+                                    ],
+                                  );
+                                return Column(
+                                  children: [
+                                    Text('${value.toInt()}',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 8)),
+                                    Text('days before',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 8)),
+                                  ],
+                                );
+                              },
+                            )),
+                            topTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false)),
+                          ),
+                          barGroups: [
+                            BarChartGroupData(x: 0, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[0]['efficiency'] ?? 0,
+                                color: durWeek[0]['efficiency'] != null &&
+                                        durWeek[0]['efficiency']! <= 90
+                                    ? Colors.red
+                                    : durWeek[0]['efficiency'] != null &&
+                                            durWeek[0]['efficiency']! >= 95
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                            BarChartGroupData(x: 1, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[1]['efficiency'] ?? 0,
+                                color: durWeek[1]['efficiency'] != null &&
+                                        durWeek[1]['efficiency']! <= 95
+                                    ? Colors.red
+                                    : durWeek[1]['efficiency'] != null &&
+                                            durWeek[1]['efficiency']! >= 98
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                            BarChartGroupData(x: 2, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[2]['efficiency'] ?? 0,
+                                color: durWeek[2]['efficiency'] != null &&
+                                        durWeek[2]['efficiency']! <= 95
+                                    ? Colors.red
+                                    : durWeek[2]['efficiency'] != null &&
+                                            durWeek[2]['efficiency']! >= 98
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                            BarChartGroupData(x: 3, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[3]['efficiency'] ?? 0,
+                                color: durWeek[3]['efficiency'] != null &&
+                                        durWeek[3]['efficiency']! <= 95
+                                    ? Colors.red
+                                    : durWeek[3]['efficiency'] != null &&
+                                            durWeek[3]['efficiency']! >= 98
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                            BarChartGroupData(x: 4, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[4]['efficiency'] ?? 0,
+                                color: durWeek[4]['efficiency'] != null &&
+                                        durWeek[4]['efficiency']! <= 95
+                                    ? Colors.red
+                                    : durWeek[4]['efficiency'] != null &&
+                                            durWeek[4]['efficiency']! >= 98
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                            BarChartGroupData(x: 5, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[5]['efficiency'] ?? 0,
+                                color: durWeek[5]['efficiency'] != null &&
+                                        durWeek[5]['efficiency']! <= 95
+                                    ? Colors.red
+                                    : durWeek[5]['efficiency'] != null &&
+                                            durWeek[5]['efficiency']! >= 98
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                            BarChartGroupData(x: 6, barRods: [
+                              BarChartRodData(
+                                toY: effWeek[6]['efficiency'] ?? 0,
+                                color: durWeek[6]['efficiency'] != null &&
+                                        durWeek[6]['efficiency']! <= 95
+                                    ? Colors.red
+                                    : durWeek[6]['efficiency'] != null &&
+                                            durWeek[6]['efficiency']! >= 98
+                                        ? Colors.green
+                                        : Colors.yellow,
+                                width: 20,
+                              ),
+                            ]),
+                          ]),
+                    )
+                  : Center(child: Text('No data'))),
+        ),
+        // SPACING
         SizedBox(
+          height: 70,
+          child: Center(
+            child: Text(
+              _dateController.text.isEmpty
+                  ? 'Sleep duration in the last week'
+                  : 'Sleep duration in the week from ${_dateController.text} to ${dateToString(DateTime.parse(_dateController.text).subtract(Duration(days: 6)))}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        if (_isLoading) CircularProgressIndicator(),
+        Center(
+          child: SizedBox(
             height: 300,
-            child: effWeek.isNotEmpty
+            child: durWeek.isNotEmpty
                 ? BarChart(
                     BarChartData(
-                        maxY: 100,
+                        gridData: FlGridData(show: false),
+                        //swapAnimationDuration: Duration(milliseconds: 150),
+                        maxY:
+                            10, //(durWeek.fold(0, (max, element) => element['duration'] != null && element['duration']! > max ? element['duration']! : max) / 2).ceil() * 2.0,
                         borderData: FlBorderData(
                             border: const Border(
                           top: BorderSide.none,
@@ -240,147 +528,174 @@ class _DataState extends State<Data> {
                           bottom: BorderSide(color: Colors.blue, width: 1),
                         )),
                         groupsSpace: 10,
+                        titlesData: FlTitlesData(
+                          show: true,
+                          leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) => Text(
+                              '${value.toInt()} h',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 10,
+                              ),
+                            ),
+                          )),
+                          rightTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) => Text(
+                              '${value.toInt()} h',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 10,
+                              ),
+                            ),
+                          )),
+                          bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) {
+                              if (value == 0)
+                                return Column(
+                                  children: [
+                                    Text('Selected',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 8)),
+                                    Text('day',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 8)),
+                                  ],
+                                );
+                              if (value == 1)
+                                return Column(
+                                  children: [
+                                    Text('${value.toInt()}',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 8)),
+                                    Text('day before',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 8)),
+                                  ],
+                                );
+                              return Column(
+                                children: [
+                                  Text('${value.toInt()}',
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 8)),
+                                  Text('days before',
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 8)),
+                                ],
+                              );
+                            },
+                          )),
+                          topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false)),
+                        ),
                         barGroups: [
                           BarChartGroupData(x: 0, barRods: [
                             BarChartRodData(
-                              toY: effWeek[0]['efficiency'] ?? 0,
-                              color: Colors.red,
+                              toY: durWeek[0]['duration'] ?? 0,
+                              color: durWeek[0]['duration'] != null &&
+                                      durWeek[0]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[0]['duration'] != null &&
+                                          durWeek[0]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                           BarChartGroupData(x: 1, barRods: [
                             BarChartRodData(
-                              toY: effWeek[1]['efficiency'] ?? 0,
-                              color: Colors.blue,
+                              toY: durWeek[1]['duration'] ?? 0,
+                              color: durWeek[1]['duration'] != null &&
+                                      durWeek[1]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[1]['duration'] != null &&
+                                          durWeek[1]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                           BarChartGroupData(x: 2, barRods: [
                             BarChartRodData(
-                              toY: effWeek[2]['efficiency'] ?? 0,
-                              color: Colors.blue,
+                              toY: durWeek[2]['duration'] ?? 0,
+                              color: durWeek[2]['duration'] != null &&
+                                      durWeek[2]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[2]['duration'] != null &&
+                                          durWeek[2]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                           BarChartGroupData(x: 3, barRods: [
                             BarChartRodData(
-                              toY: effWeek[3]['efficiency'] ?? 0,
-                              color: Colors.blue,
+                              toY: durWeek[3]['duration'] ?? 0,
+                              color: durWeek[3]['duration'] != null &&
+                                      durWeek[3]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[3]['duration'] != null &&
+                                          durWeek[3]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                           BarChartGroupData(x: 4, barRods: [
                             BarChartRodData(
-                              toY: effWeek[4]['efficiency'] ?? 0,
-                              color: Colors.blue,
+                              toY: durWeek[4]['duration'] ?? 0,
+                              color: durWeek[4]['duration'] != null &&
+                                      durWeek[4]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[4]['duration'] != null &&
+                                          durWeek[4]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                           BarChartGroupData(x: 5, barRods: [
                             BarChartRodData(
-                              toY: effWeek[5]['efficiency'] ?? 0,
-                              color: Colors.blue,
+                              toY: durWeek[5]['duration'] ?? 0,
+                              color: durWeek[5]['duration'] != null &&
+                                      durWeek[5]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[5]['duration'] != null &&
+                                          durWeek[5]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                           BarChartGroupData(x: 6, barRods: [
                             BarChartRodData(
-                              toY: effWeek[6]['efficiency'] ?? 0,
-                              color: Colors.blue,
+                              toY: durWeek[6]['duration'] ?? 0,
+                              color: durWeek[6]['duration'] != null &&
+                                      durWeek[6]['duration']! < 6
+                                  ? Colors.red
+                                  : durWeek[6]['duration'] != null &&
+                                          durWeek[6]['duration']! > 8
+                                      ? Colors.green
+                                      : Colors.yellow,
                               width: 20,
                             ),
                           ]),
                         ]),
                   )
-                : Center(child: Text('No data'))),
-        // SPACING
-        SizedBox(
-          height: 50,
-          child: Center(
-            child: Text(
-              'Sleep duration in the last week',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
+                : Text('No data available'),
           ),
         ),
-        if (_isLoading) CircularProgressIndicator(),
         SizedBox(
-          height: 300,
-          child: durWeek.isNotEmpty
-              ? BarChart(
-                  BarChartData(
-                      maxY: 12, // maxDuration + 1
-                      borderData: FlBorderData(
-                          border: const Border(
-                        top: BorderSide.none,
-                        right: BorderSide(color: Colors.blue, width: 1),
-                        left: BorderSide(color: Colors.blue, width: 1),
-                        bottom: BorderSide(color: Colors.blue, width: 1),
-                      )),
-                      groupsSpace: 10,
-                      titlesData: FlTitlesData(
-                        show: true,
-                        bottomTitles: AxisTitles(),
-                      ),
-                      barGroups: [
-                        BarChartGroupData(x: 0, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[0]['duration'] ?? 0,
-                            color: Colors.red,
-                            width: 20,
-                          ),
-                        ]),
-                        BarChartGroupData(x: 1, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[1]['duration'] ?? 0,
-                            color: Colors.blue,
-                            width: 20,
-                          ),
-                        ]),
-                        BarChartGroupData(x: 2, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[2]['duration'] ?? 0,
-                            color: Colors.blue,
-                            width: 20,
-                          ),
-                        ]),
-                        BarChartGroupData(x: 3, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[3]['duration'] ?? 0,
-                            color: Colors.blue,
-                            width: 20,
-                          ),
-                        ]),
-                        BarChartGroupData(x: 4, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[4]['duration'] ?? 0,
-                            color: Colors.blue,
-                            width: 20,
-                          ),
-                        ]),
-                        BarChartGroupData(x: 5, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[5]['duration'] ?? 0,
-                            color: Colors.blue,
-                            width: 20,
-                          ),
-                        ]),
-                        BarChartGroupData(x: 6, barRods: [
-                          BarChartRodData(
-                            toY: durWeek[6]['duration'] ?? 0,
-                            color: Colors.blue,
-                            width: 20,
-                          ),
-                        ]),
-                      ]),
-                )
-              : Text('No data available'),
+          height: 50,
+          child: Center(),
         ),
-
         Container(
           padding: const EdgeInsets.all(10),
           color: Color.fromARGB(255, 129, 7, 143),
@@ -391,7 +706,7 @@ class _DataState extends State<Data> {
               color: Colors.black,
             ),
           ),
-        )
+        ),
       ],
     ));
   }
@@ -500,7 +815,7 @@ Future<List<HeartRate>> _requestDataHR(
 
   if (response.statusCode == 200) {
     final decodedResponse = jsonDecode(response.body);
-
+    print('-------REQUESTING HR ----------');
     for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
       resultHr.add(HeartRate.fromJson(decodedResponse['data']['data'][i]));
     }
@@ -514,6 +829,8 @@ Future<List<HeartRate>> _requestDataHR(
 Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
     String dateFormatted) async {
   List<HREntity> hrEntities = [];
+  print(
+      '---------------------------DATA FROM INSERT HEART RATES---------------------------');
   print('dateFormatted');
   print(dateFormatted); //dateFormatted is in the format yyyy-MM-dd
 
@@ -684,7 +1001,7 @@ Future<bool?> AlcolCheck(String date, BuildContext context) async {
 
   Sleepentry? sleepentry_current_day =
       await Provider.of<ProviderSleep>(context, listen: false)
-          .findDateSleep(previousDate);
+          .findDateSleep(date);
   bool efficiency_param;
   bool sleep_time_param;
   bool HR_param;

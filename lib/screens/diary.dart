@@ -34,22 +34,24 @@ class _DiaryState extends State<Diary> {
     });
   }
 
-  //Variables that control the mood
-  //Booleans are easier to work with into the diary but we use a string to
-  //store more efficiently the mood into the database
+  // Variables that control the mood
+  // Booleans are easier to work with into the diary but we use a string to
+  // store more efficiently the mood into the database
   bool _happyPressed = false;
   bool _neutralPressed = false;
   bool _sadPressed = false;
 
-  //Initialized as null
+  // Initialized as null
   String? _entryMood;
   String? _entryText;
 
-  //Shown if the user does not fill the entry
+  // Shown if the user does not fill the entry
   final snackBarText = const SnackBar(
+    backgroundColor: Colors.deepOrange,
     content: Text('You should write something'),
   );
   final snackBarMood = const SnackBar(
+    backgroundColor: Colors.deepOrange,
     content: Text('You should pick a mood'),
   );
 
@@ -59,89 +61,96 @@ class _DiaryState extends State<Diary> {
   Widget build(BuildContext context) {
     print('Diary built');
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: isDarkModeEnabled
-            ? ThemeData(
-                brightness: Brightness.dark,
-                colorScheme: const ColorScheme.dark(
-                  primary: Colors.black,
-                  background: Colors.black,
-                  onBackground: Colors.black,
-                  secondary: Colors.yellow,
-                ),
-              )
-            : ThemeData(
-                brightness: Brightness.light,
-                colorScheme: const ColorScheme.light(
-                  primary: Color.fromARGB(190, 71, 70, 70),
-                  background: Color.fromARGB(255, 0, 0, 0),
-                  onBackground: Colors.white,
-                  secondary: Colors.yellow,
-                ),
+      debugShowCheckedModeBanner: false,
+      theme: isDarkModeEnabled
+          ? ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: const ColorScheme.dark(
+                primary: Colors.black,
+                background: Colors.black,
+                onBackground: Colors.black,
+                secondary: Colors.yellow,
               ),
-        home: Scaffold(
-          appBar: const MyAppbar(),
-          drawer: const MyDrawer(),
-          body: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("How do you feel today?",
-                    style: TextStyle(fontSize: 18)),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  IconButton(
-                    iconSize: 60,
-                    icon: Icon(
-                      Icons.sentiment_very_satisfied,
-                      color: _happyPressed ? Colors.green : Colors.black,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _happyPressed = true;
-                        _neutralPressed = false;
-                        _sadPressed = false;
-                        _entryMood = 'Happy';
-                      });
-                    },
+            )
+          : ThemeData(
+              brightness: Brightness.light,
+              colorScheme: const ColorScheme.light(
+                primary: Color.fromARGB(190, 71, 70, 70),
+                background: Color.fromARGB(255, 0, 0, 0),
+                onBackground: Colors.white,
+                secondary: Colors.yellow,
+              ),
+            ),
+      home: Scaffold(
+        appBar: const MyAppbar(),
+        body: Builder(
+          // Add Builder widget here
+          builder: (BuildContext context) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "How do you feel today?",
+                    style: TextStyle(fontSize: 18),
                   ),
-                  IconButton(
-                    iconSize: 60,
-                    icon: Icon(
-                      Icons.sentiment_neutral,
-                      color: _neutralPressed ? Colors.orange : Colors.black,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _happyPressed = false;
-                        _neutralPressed = true;
-                        _sadPressed = false;
-                        _entryMood = 'Neutral';
-                      });
-                    },
+                  const SizedBox(
+                    height: 20,
                   ),
-                  IconButton(
-                    iconSize: 60,
-                    icon: Icon(
-                      Icons.sentiment_very_dissatisfied,
-                      color: _sadPressed ? Colors.red : Colors.black,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _happyPressed = false;
-                        _neutralPressed = false;
-                        _sadPressed = true;
-                        _entryMood = 'Sad';
-                      });
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        iconSize: 60,
+                        icon: Icon(
+                          Icons.sentiment_very_satisfied,
+                          color: _happyPressed ? Colors.green : Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _happyPressed = true;
+                            _neutralPressed = false;
+                            _sadPressed = false;
+                            _entryMood = 'Happy';
+                          });
+                        },
+                      ),
+                      IconButton(
+                        iconSize: 60,
+                        icon: Icon(
+                          Icons.sentiment_neutral,
+                          color: _neutralPressed ? Colors.orange : Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _happyPressed = false;
+                            _neutralPressed = true;
+                            _sadPressed = false;
+                            _entryMood = 'Neutral';
+                          });
+                        },
+                      ),
+                      IconButton(
+                        iconSize: 60,
+                        icon: Icon(
+                          Icons.sentiment_very_dissatisfied,
+                          color: _sadPressed ? Colors.red : Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _happyPressed = false;
+                            _neutralPressed = false;
+                            _sadPressed = true;
+                            _entryMood = 'Sad';
+                          });
+                        },
+                      ),
+                    ],
                   ),
-                ]),
-                const SizedBox(
-                  height: 100,
-                ),
-                SizedBox(
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  SizedBox(
                     width: 300.0,
                     child: TextField(
                       controller: textController,
@@ -181,56 +190,66 @@ class _DiaryState extends State<Diary> {
                           ),
                         ),
                         suffixIcon: IconButton(
-                            icon: const Icon(Icons.clear),
-                            color: Colors.grey[400],
-                            onPressed: () {
-                              textController.clear();
-                            }),
+                          icon: const Icon(Icons.clear),
+                          color: Colors.grey[400],
+                          onPressed: () {
+                            textController.clear();
+                          },
+                        ),
                       ),
-                    )),
-                const SizedBox(
-                  height: 50,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _entryCheck(context);
-                  },
-                  style: ElevatedButton.styleFrom(
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _entryCheck(context);
+                    },
+                    style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.yellow,
                       fixedSize: const Size(200, 70),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30))),
-                  child: const Text('Submit',
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text(
+                      'Submit',
                       style: TextStyle(
-                          fontSize: 25,
-                          color: Color.fromARGB(255, 129, 7, 143))),
-                ),
-              ],
-            ),
-          ),
-        ));
-  } //build
+                        fontSize: 25,
+                        color: Color.fromARGB(255, 129, 7, 143),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
   void _entryCheck(BuildContext context) async {
     if (_entryMood == null) {
-      //Snackbar for missing mood
+      // Snackbar for missing mood
       ScaffoldMessenger.of(context).showSnackBar(snackBarMood);
     } else if (_entryText == '' || _entryText == null) {
-      //Snackbar for missing text
+      // Snackbar for missing text
       ScaffoldMessenger.of(context).showSnackBar(snackBarText);
     } else {
-      //If everything is ok i record the entry into the database
+      // If everything is ok, record the entry into the database
       await Provider.of<DatabaseRepository>(context, listen: false)
           .insertDiaryentry(
               Diaryentry(getTodayDate(), _entryText!, _entryMood!));
 
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const Homepage()),
-          (route) => false);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Homepage()),
+      );
     }
   }
-} //HomePage
+}
 
 /*
 DA METTERE SE CI SONO PROBLEMI

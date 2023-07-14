@@ -242,8 +242,8 @@ class CalendarDiary extends State<CustomAgenda> {
     } else if (compare(mood, Colors.red)) {
       return Icons.sentiment_very_dissatisfied;
     } else {
-      print('Qualcosa è andato storto nella selezione del mood');
-      return Icons.question_mark;
+      //It means that we're dealing with a self report
+      return Icons.warning;
     }
   }
 
