@@ -29,6 +29,7 @@ class _ProfileState extends State<Profile> {
   String photoUrl = '';
   String GoogleName = '';
   String GoogleEmail = '';
+  String profilePicturePath = '';
   TextEditingController nameController = TextEditingController();
   late TextEditingController googleNameController = TextEditingController();
   late TextEditingController googleEmailController = TextEditingController();
@@ -55,14 +56,14 @@ class _ProfileState extends State<Profile> {
       nameController.text = name;
       surnameController.text = surname;
       emailController.text = email;
-      final profilePicturePath = sp.getString('profilePicture');
+      profilePicturePath = sp.getString('profilePicture') ?? '';
       googleNameController = TextEditingController(text: GoogleName);
       googleEmailController = TextEditingController(text: GoogleEmail);
       /*if (base64Image != null) {
         final bytes = base64Decode(base64Image);
         _profilePicture = File.fromRawPath(bytes);
       }*/
-      if (profilePicturePath != null) {
+      if (profilePicturePath != null && profilePicturePath != '') {
         profilePicture =
             File(profilePicturePath.replaceFirst('/', Platform.pathSeparator));
       }
@@ -90,6 +91,9 @@ class _ProfileState extends State<Profile> {
   Future<XFile?> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final sp = await SharedPreferences.getInstance();
+    sp.setString('profilePicture', pickedFile!.path);
+    print('saved image path');
     return pickedFile;
   }
 

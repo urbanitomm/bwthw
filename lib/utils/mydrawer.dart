@@ -29,7 +29,9 @@ class MyDrawer extends StatelessWidget {
         final photoUrl = sp.getString('photoUrl') ?? '';
         final profilePicturePath = sp.getString('profilePicture');
         final drawerPicture =
-            profilePicturePath != null ? File(profilePicturePath) : null;
+            profilePicturePath != null && profilePicturePath != ''
+                ? File(profilePicturePath)
+                : null;
         /*final drawerPicture =
             isGoogleUser && photoUrl.isEmpty && profilePicturePath != null
                 ? File(profilePicturePath)
