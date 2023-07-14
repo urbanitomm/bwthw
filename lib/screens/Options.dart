@@ -7,6 +7,7 @@ import 'package:progetto_wearable/screens/login.dart';
 import 'package:provider/provider.dart';
 import 'package:progetto_wearable/repository/localizatioProvider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:progetto_wearable/screens/map.dart';
 
 class Options extends StatelessWidget {
   const Options({Key? key}) : super(key: key);
@@ -172,6 +173,10 @@ class OptionState extends State<OptionS> {
                     Provider.of<GeolocationProvider>(context, listen: false)
                         .enableGeolocalizatio(true, LocationPermission.always);
                     isGeolocalizationEnabled = value3;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MapView()),
+                    );
                   } else {
                     Provider.of<GeolocationProvider>(context, listen: false)
                         .disableGeolocalizatio(

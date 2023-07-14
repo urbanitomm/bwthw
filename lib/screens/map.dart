@@ -89,14 +89,31 @@ class _MapViewState extends State<MapView> {
       await location.enableBackgroundMode(enable: false);
       await NotificationService().cancelNotification();
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Options(
-              /*
-              snackbarMessage:
-                  'You should activate geolocalization to access this page'*/
-              );
-        }));
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        final snackBar = SnackBar(
+          backgroundColor: Colors.deepOrange,
+          elevation: 10,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          content: Container(
+            width: 250, // Adjust the width as desired
+            height: 100, // Adjust the height as desired
+            child: Center(
+              child: Text(
+                'You should activate geolocalization to access this page',
+                style: TextStyle(fontSize: 22),
+              ),
+            ),
+          ),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Options();
+          }));
+        });
       });
       /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.deepOrange,
@@ -184,8 +201,8 @@ class _MapViewState extends State<MapView> {
                         width: 80,
                         height: 80,
                         builder: (context) => Icon(
-                          Icons.circle,
-                          color: Colors.yellow,
+                          Icons.location_on,
+                          color: Colors.red,
                           size: 40,
                         ),
                       ),
