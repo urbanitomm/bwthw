@@ -69,7 +69,7 @@ class _LoginPage extends State<Login> {
       sp.setString('photoUrl', googleUser.photoUrl ?? '');
 
       sp.setBool('isGoogleUser', true); // Set isGoogle to true for Google login
-      _toDiaryPage(context);
+      _toDiaryPageGoogle(context);
     }
   }
 
@@ -268,13 +268,6 @@ class _LoginPage extends State<Login> {
           MaterialPageRoute(builder: (context) => const Diary()));
 
       //If the user already has written in the diary they will go to the homepage
-    }
-    final GoogleSignInAccount? googleUser =
-        await _googleSignIn.signInSilently();
-    if (googleUser != null) {
-      // If the user is logged in with Google, navigate to the homepage
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const Homepage()));
     } else if (sp.getString('lastEntryDate') == getTodayDate()) {
       print("Oggi ho gia scritto");
       Navigator.of(context).pushReplacement(
@@ -286,6 +279,37 @@ class _LoginPage extends State<Login> {
       print('"Oggi non ho ancora scritto"');
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const Diary()));
+    }
+  }
+
+  void _toDiaryPageGoogle(BuildContext context) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    final GoogleSignInAccount? googleUser =
+        await _googleSignIn.signInSilently();
+    if (googleUser != null) {
+      // If the user is logged in with Google, navigate to the homepage
+      if (sp.containsKey('lastEntryDate') == false) {
+        //The string format is overall more compatible with other parts of the code
+        sp.setString('lastEntryDate', getTodayDate());
+        //Prepopulation of the database before the first login of the user
+        await prepopulate(context);
+        print('Populated');
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Diary()));
+
+        //If the user already has written in the diary they will go to the homepage
+      } else if (sp.getString('lastEntryDate') == getTodayDate()) {
+        print("Oggi ho gia scritto");
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Homepage()));
+
+        //If the user hasn't written into the diary the navigation will bring them to the diary
+      } else {
+        sp.setString('lastEntryDate', getTodayDate());
+        print('"Oggi non ho ancora scritto"');
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Diary()));
+      }
     }
   }
 } // LoginScreen
