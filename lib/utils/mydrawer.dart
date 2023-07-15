@@ -128,15 +128,15 @@ class MyDrawer extends StatelessWidget {
                     //Logging out the shared preferences for the profile are deleted
                     SharedPreferences sp =
                         await SharedPreferences.getInstance();
-                    await sp.remove("username");
-                    await sp.remove("name");
-                    await sp.remove("surname");
-                    await sp.remove("email");
+                    //await sp.remove("username");
+                    //await sp.remove("name");
+                    //await sp.remove("surname");
+                    //await sp.remove("email");
                     await sp.remove("isGoogleUser");
                     await sp.remove("Google_name");
                     await sp.remove("Google_email");
                     await sp.remove("photoUrl");
-                    await sp.remove("profilePicture");
+                    //await sp.remove("profilePicture");
                     await sp.remove("logged");
 
                     print('SP cleaned');

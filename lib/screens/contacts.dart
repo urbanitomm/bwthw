@@ -413,7 +413,11 @@ class ContactState extends State<ContactsPage> {
                       asyncAddDialog(context);
                     });
                   },
-                  icon: const Icon(Icons.add, size: 18),
+                  icon: const Icon(
+                    Icons.add,
+                    size: 18,
+                    color: Colors.yellow,
+                  ),
                   label: const Text("ADD CONTACT",
                       style: TextStyle(fontSize: 20, color: Colors.yellow)),
                 ),

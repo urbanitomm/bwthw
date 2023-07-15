@@ -57,14 +57,13 @@ class _DataState extends State<Data> {
       } else {
         selectedDate = _dateController.text;
       }
-      print('selected date: $selectedDate');
 
       heartRates = await _requestDataHR(context, selectedDate);
 
       var prev_date = DateTime.parse(selectedDate);
       prev_date = prev_date.subtract(Duration(days: 1));
       var prev_date_formatted = dateToString(prev_date).substring(0, 10);
-      print('prev_date_formatted: $prev_date_formatted');
+
       heartRates_prev_day = await _requestDataHR(context, prev_date_formatted);
       //I retrieve data from both current day and previous day since sometimes it's necessary to have HR data from the startaime to midnight
       await insertHeartRates(heartRates, context, selectedDate);
@@ -688,7 +687,7 @@ class _DataState extends State<Data> {
 // This method allows to obtain the JWT token pair from IMPACT and store it in SharedPreferences
 Future<int?> _authorize() async {
   //Create request
-  print('asking aurorization');
+
   final url = Impact.baseUrl + Impact.tokenEndpoint;
   final body = {
     'username': Impact.username,
@@ -714,7 +713,6 @@ Future<int?> _authorize() async {
     prefs.setString('access', accessToken);
     prefs.setString('refresh', refreshToken);
 
-    print('authorized');
     return 200;
   } else {
     return null;
@@ -753,7 +751,6 @@ Future<int> _refreshToken() async {
 // This method allows to obtain the HR data from IMPACT
 Future<List<HeartRate>> _requestDataHR(
     BuildContext context, String date) async {
-  print('before authorize');
   final result = await _authorize();
   result == 200 ? 'You have been authorized' : 'You have been denied access';
   //initialize the result
@@ -782,30 +779,25 @@ Future<List<HeartRate>> _requestDataHR(
     headers: headers,
   );
 
-  print(response.statusCode);
-
   //Check response
 
   if (response.statusCode == 200) {
     final decodedResponse = jsonDecode(response.body);
-    print('-------REQUESTING HR ----------');
+
     for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
       resultHr.add(HeartRate.fromJson(decodedResponse['data']['data'][i]));
     }
   } else {
     print(response.statusCode);
   }
-  print('finished with DB');
+
   return resultHr;
 }
 
 Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
     String dateFormatted) async {
   List<HREntity> hrEntities = [];
-  print(
-      '---------------------------DATA FROM INSERT HEART RATES---------------------------');
-  print('dateFormatted');
-  print(dateFormatted); //dateFormatted is in the format yyyy-MM-dd
+  //dateFormatted is in the format yyyy-MM-dd
 
   // Questo è il for per inserire tutte le entry di una data
   for (var heartRate in heartRates) {
@@ -833,7 +825,6 @@ Future<void> insertHeartRates(List<HeartRate> heartRates, BuildContext context,
     hrEntities.add(hrEntity);
   }
   Provider.of<ProviderHR>(context, listen: false).insertMultipleHR(hrEntities);
-  print('inserted HR in the DB');
 }
 
 // This method allows to obtain the Sleep data from IMPACT
@@ -871,9 +862,6 @@ Future<Sleep?> _requestDataSleep(
     headers: headers,
   );
 
-  print(response.statusCode); //statusCode is int type
-
-  print((response.body));
   if (response.statusCode == 200) {
     // Parse the JSON response
 
@@ -887,15 +875,7 @@ Future<Sleep?> _requestDataSleep(
     } else {
       Map<String, dynamic> sleepData = data['data'][0];
 //result of the extratcted data from the server
-      print(
-          '---------------------------------------------DATA FROM REQUEST_DATA_SLEEP---------------------------------------------------');
-      print(sleepData['dateOfSleep']); //dateOfSleep is in the format MM-dd
-      print(sleepData['startTime']); //startTime is in the format MM-dd hh:mm:ss
-      print(sleepData['endTime']); //endTime is in the format MM-dd hh:mm:ss
-      print(sleepData['duration']); //duration is in ms
-      print(sleepData['efficiency']); //efficiency is in %
-      print(
-          '---------------------------------------------END DATA FROM REQUEST_DATA_SLEEP---------------------------------------------------');
+
       String dateOfSleep = sleepData['dateOfSleep'].toString();
       String startTime = sleepData['startTime'].toString();
       String endTime = sleepData['endTime'].toString();
@@ -921,18 +901,7 @@ Future<Sleep?> _requestDataSleep(
 Future<void> insertSleep(
     Sleep? sleeps, BuildContext context, String dateFormatted) async {
   var sl;
-  print(
-      '---------------------------DATA FROM INSERT SLEEP---------------------------');
-  print('input data from the Sleep? data type');
-  print('Date of sleep, start time and endtime as they are provided');
-  print(
-    sleeps?.dateOfSleep,
-  ); //eg. 07-14
-  print(sleeps?.startTime); //eg. 07-04 23:29:00
-  print(sleeps?.endTime);
-  print('start time and endtime converted in DateTime format');
-  print(stringToDateTime(sleeps?.startTime));
-  print(stringToDateTime(sleeps?.endTime));
+
   sl = Sleepentry(
     dateFormatted,
     dateTimeToDouble2(stringToDateTime(sleeps
@@ -943,27 +912,9 @@ Future<void> insertSleep(
     sleeps?.efficiency,
   );
 
-  print('sleep Entry is');
-  print(sl.date);
-  print(sl.startTime);
-  print(sl.endTime);
-  print(sl.duration);
-  print(sl.efficiency);
-  print('inverse conversion of startTime and endTime from double to dateTime');
-  print(doubleToDateTime2(sl.startTime));
-  print(doubleToDateTime2(sl.endTime));
   Provider.of<ProviderSleep>(context, listen: false).insertSleep(sl);
   Sleepentry? sl1 = await Provider.of<ProviderSleep>(context, listen: false)
       .findDateSleep(sl.date);
-  print('sleep Entry extracted is');
-  print(sl1?.date);
-  print(sl1?.startTime);
-  print(sl1?.endTime);
-  print(sl1?.duration);
-  print(sl1?.efficiency);
-  print('inserted sleep in the DB');
-  print(
-      '------------------------------------------end of insertSleep function----------------------------------------------------------------');
 }
 
 Future<bool?> AlcolCheck(String date, BuildContext context) async {
@@ -1097,8 +1048,6 @@ Future<List<Map<String, double?>>> efficiencyWeek(
         await Provider.of<ProviderSleep>(context, listen: false)
             .findEfficiency(dates[i]);
     efficiencyWeek.add({'date': i.toDouble(), 'efficiency': efficiency});
-    print('Date: ${dates[i]}');
-    print('efficiency: ${efficiencyWeek[i].toString()}');
   }
   return efficiencyWeek;
 }
@@ -1123,8 +1072,6 @@ Future<List<Map<String, double?>>> durationWeek(
       'date': i.toDouble(),
       'duration': duration != null ? duration / (1000 * 60 * 60) : null,
     });
-    print('Date: ${dates[i]}');
-    print('duration: ${durationWeek[i].toString()}');
   }
   return durationWeek;
 }
